@@ -28,6 +28,28 @@ const api = {
     }
   },
 
+  // Create multiple transactions
+  createTransactions: async (userId, transactions) => {
+    try {
+      const promises = transactions.map((transaction) => {
+        const transactionData = {
+          ...transaction,
+          userId,
+        };
+        console.log("Sending Transaction Data:", transactionData);
+        return axios.post(`${BASE_URL}/transactions`, transactionData);
+      });
+
+      const responses = await Promise.all(promises);
+      return responses.map((response) => response.data);
+    } catch (error) {
+      console.error("Error in createTransactions:", error.response?.data);
+      throw new Error(
+        error.response?.data?.error || "Error creating transactions"
+      );
+    }
+  },
+
   // Rent Rate APIs
   getRentRates: async () => {
     try {
@@ -61,6 +83,38 @@ const api = {
       throw new Error(
         error.response?.data?.error || "Error fetching transactions"
       );
+    }
+  },
+
+  // Get all transactions
+  getAllTransactions: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/transactions`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || "Error fetching transactions"
+      );
+    }
+  },
+
+  //Get all users
+  getAllUsers: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/users`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || "Error fetching users");
+    }
+  },
+
+  // Update User API
+  updateUser: async (userId, userData) => {
+    try {
+      const response = await axios.put(`${BASE_URL}/users/${userId}`, userData);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || "Error updating user");
     }
   },
 };

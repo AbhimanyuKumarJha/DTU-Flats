@@ -6,12 +6,39 @@ const User = require("../models/User");
 // Create a new transaction
 exports.createTransaction = async (req, res) => {
   try {
-    const transaction = new Transaction(req.body);
+    const {
+      userId,
+      paymentMode,
+      calculatedAmount,
+      monthsPaid,
+      paymentDetails,
+      status,
+    } = req.body;
+
+    // Basic validation on the server-side
+    if (
+      !userId ||
+      !paymentMode ||
+      !calculatedAmount ||
+      !monthsPaid ||
+      monthsPaid.length === 0
+    ) {
+      return res.status(400).json({ error: "Missing required fields." });
+    }
+
+    const transaction = new Transaction({
+      userId,
+      paymentMode,
+      calculatedAmount,
+      monthsPaid,
+      paymentDetails,
+      status,
+    });
     await transaction.save();
 
     // Update user's transactions array
     await User.findByIdAndUpdate(
-      req.body.userId,
+      userId,
       { $push: { transactions: transaction._id } },
       { new: true }
     );

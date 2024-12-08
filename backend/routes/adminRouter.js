@@ -14,4 +14,7 @@ router.get("/", adminController.getAllAdmins);
 // Route to delete an admin by ID
 router.delete("/:id", adminController.deleteAdmin);
 
+// Route to get an admin by email
+router.get("/:email", adminController.getAdminByEmail);
+
 module.exports = router;

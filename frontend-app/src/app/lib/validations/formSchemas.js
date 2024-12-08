@@ -26,22 +26,25 @@ export const userSchema = z.object({
     .max(5, "Cannot select more than 5 floors"),
   mobileNumber: z.string().regex(/^[6-9]\d{9}$/, "Invalid mobile number"),
   alternateMobileNumber: z
-    .string()
-    .regex(/^[6-9]\d{9}$/, "Invalid mobile number")
-    .optional()
-    .nullable(),
+    .union([
+      z.string().regex(/^[6-9]\d{9}$/, "Invalid mobile number"),
+      z.string().length(0),
+    ])
+    .optional(),
   isActive: z.boolean(),
   certificateIssued: z.enum(CERTIFICATE_OPTIONS),
 });
 
 export const transactionSchema = z.object({
   userId: z.string(),
-  monthsPaid: z.array(
-    z.object({
-      month: z.number().min(1).max(12),
-      year: z.number().min(2000).max(2100),
-    })
-  ),
+  monthsPaid: z
+    .array(
+      z.object({
+        month: z.number().min(1).max(12),
+        year: z.number().min(2000).max(2100),
+      })
+    )
+    .min(1, "At least one month must be specified"),
   calculatedAmount: z.number().positive(),
   paymentMode: z.enum(Object.values(PAYMENT_MODES)),
   paymentDetails: z
@@ -49,21 +52,30 @@ export const transactionSchema = z.object({
       chequeOrDDNumber: z.string().optional(),
       upiTransactionId: z.string().optional(),
     })
-    .refine((data) => {
-      if (
-        data.paymentMode === PAYMENT_MODES.UPI &&
-        !data.paymentDetails.upiTransactionId
-      ) {
-        return false;
-      }
-      if (
-        (data.paymentMode === PAYMENT_MODES.DD ||
-          data.paymentMode === PAYMENT_MODES.CHEQUE) &&
-        !data.paymentDetails.chequeOrDDNumber
-      ) {
-        return false;
-      }
-      return true;
-    }, "Payment details are required for the selected payment mode"),
+    .refine(
+      (data, ctx) => {
+        const { paymentMode } = ctx.parent;
+        if (paymentMode === PAYMENT_MODES.UPI && !data.upiTransactionId) {
+          return ctx.addIssue({
+            path: ["upiTransactionId"],
+            message: "UPI Transaction ID is required for UPI payments",
+            code: z.ZodIssueCode.custom,
+          });
+        }
+        if (
+          (paymentMode === PAYMENT_MODES.DD ||
+            paymentMode === PAYMENT_MODES.CHEQUE) &&
+          !data.chequeOrDDNumber
+        ) {
+          return ctx.addIssue({
+            path: ["chequeOrDDNumber"],
+            message: "Cheque/DD number is required for Cheque/DD payments",
+            code: z.ZodIssueCode.custom,
+          });
+        }
+        return true;
+      },
+      { message: "Invalid payment details", path: ["paymentDetails"] }
+    ),
   status: z.enum(Object.values(TRANSACTION_STATUS)),
 });

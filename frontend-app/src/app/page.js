@@ -1,8 +1,8 @@
-import Form from "./Add/Form";
+import Form from "./New/Form";
 import Link from "next/link";
 import Navbar from "./Navbar";
 import Login from "./Login/page";
-import Addpage from "./Add/page";
+import Addpage from "./New/page";
 
 export default function Home() {
   return (

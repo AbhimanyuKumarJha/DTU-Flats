@@ -1,274 +1,272 @@
 "use client";
-import axios from "axios";
+
 import React, { useState, useEffect } from "react";
-import Form from "./viewBox";
-import {
-  AiOutlineClose,
-  AiFillEdit,
-  AiOutlineArrowUp,
-  AiOutlineArrowDown,
-} from "react-icons/ai";
-import PopUP from "../utils/popup";
+import Link from "next/link";
+import api from "../lib/services/api";
+import PopUp from "../utils/popup";
+import { FaFileDownload } from "react-icons/fa";
 
-const List = () => {
-  const [data, setData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [nameFilter, setNameFilter] = useState("");
-  const [dobFilter, setDobFilter] = useState("");
-  const [mobileFilter, setMobileFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+// Status Indicator Component
+const StatusIndicator = ({ status }) => {
+  let color = "gray";
+  if (status === "Completed") color = "green";
+  else if (status === "Pending") color = "yellow";
+  else if (status === "Failed") color = "red";
+
+  return (
+    <div className="flex justify-center">
+      <span
+        className={`inline-block h-4 w-4 rounded-full bg-${color}-500`}
+        title={status}
+      ></span>
+    </div>
+  );
+};
+
+const ViewPage = () => {
+  const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Filters
+  const [filterName, setFilterName] = useState("");
+  const [filterStatus, setFilterStatus] = useState("All");
+  const [filterContact, setFilterContact] = useState("");
+  const [filterDob, setFilterDob] = useState("");
+
+  // Sorting
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+
+  // Popup State
   const [showPopup, setShowPopup] = useState(false);
-  const [sortOrder, setSortOrder] = useState("asc");
+  const [popupMessage, setPopupMessage] = useState("");
 
-  const [editUserId, setEditUserId] = useState(null);
-  const [editUser, setEditUser] = useState({
-    name: "",
-    dateOfBirth: "",
-    address: "",
-    floorNumber: "",
-    units: "",
-    monthlyCharges: "",
-    mobileNumber: "",
-    alternateMobileNumber: "",
-    certificateIssued: "",
-    isActive: false,
-  });
-
-  const getList = async (filters = {}) => {
+  // Fetch all users when the component mounts
+  const fetchUsers = async () => {
     try {
-      const response = await axios.get("/api/list", { params: filters });
-      setData(response.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
+      const data = await api.getAllUsers();
+      setUsers(data);
+      setFilteredUsers(data);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      setError("Failed to load users.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Fetch data when the component mounts
   useEffect(() => {
-    getList();
+    fetchUsers();
   }, []);
 
+  // Apply Filters and Sorting
   useEffect(() => {
-    applyFilters(); // Apply filters whenever data or filters change
-  }, [data, nameFilter, dobFilter, mobileFilter, statusFilter, sortOrder]);
+    let filtered = [...users];
 
-  const applyFilters = () => {
-    if (!Array.isArray(data)) {
-      console.error("Data is not an array:", data);
-      return; // Exit if data is not an array
-    }
-    
-    let filtered = [...data]; // Create a copy of data to filter
-
-    if (nameFilter) {
+    // Filter by Name
+    if (filterName.trim() !== "") {
       filtered = filtered.filter((user) =>
-        user.name.toLowerCase().includes(nameFilter.toLowerCase())
+        user.name.toLowerCase().includes(filterName.trim().toLowerCase())
       );
     }
-    if (dobFilter) {
+
+    // Filter by Status
+    if (filterStatus !== "All") {
+      filtered = filtered.filter(
+        (user) => user.isActive === (filterStatus === "Active")
+      );
+    }
+
+    // Filter by Contact
+    if (filterContact.trim() !== "") {
+      filtered = filtered.filter((user) =>
+        user.mobileNumber
+          .toLowerCase()
+          .includes(filterContact.trim().toLowerCase())
+      );
+    }
+
+    // Filter by Date of Birth
+    if (filterDob !== "") {
       filtered = filtered.filter(
         (user) =>
-          new Date(user.dateOfBirth).toISOString().split("T")[0] === dobFilter
-      );
-    }
-    if (mobileFilter) {
-      filtered = filtered.filter((user) =>
-        user.mobileNumber.includes(mobileFilter)
-      );
-    }
-    if (statusFilter) {
-      filtered = filtered.filter(
-        (user) => user.isActive === (statusFilter === "active")
+          new Date(user.dateOfBirth).toISOString().split("T")[0] === filterDob
       );
     }
 
-    // Sorting after filtering
-    filtered.sort((a, b) => {
-      const nameA = a.name.toLowerCase();
-      const nameB = b.name.toLowerCase();
-      return sortOrder === "asc"
-        ? nameA > nameB
-          ? 1
-          : -1
-        : nameA < nameB
-        ? 1
-        : -1;
-    });
+    // Apply Sorting
+    if (sortConfig.key) {
+      filtered = filtered.sort((a, b) => {
+        let aField, bField;
 
-    setFilteredData(filtered);
-  };
+        switch (sortConfig.key) {
+          case "Name":
+            aField = a.name.toLowerCase();
+            bField = b.name.toLowerCase();
+            break;
+          case "Contact":
+            aField = a.mobileNumber.toLowerCase();
+            bField = b.mobileNumber.toLowerCase();
+            break;
+          case "Date of Birth":
+            aField = new Date(a.dateOfBirth);
+            bField = new Date(b.dateOfBirth);
+            break;
+          default:
+            return 0;
+        }
 
-  const handleNameChange = (e) => {
-    setNameFilter(e.target.value);
-  };
-
-  const handleDobChange = (e) => {
-    setDobFilter(e.target.value);
-  };
-
-  const handleMobileChange = (e) => {
-    setMobileFilter(e.target.value);
-  };
-
-  const handleSortByName = () => {
-    setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
-  };
-
-  const handleEditClick = (user) => {
-    setEditUserId(user._id);
-    setEditUser({
-      id: user._id,
-      name: user.name,
-      dateOfBirth: new Date(user.dateOfBirth).toISOString().split("T")[0],
-      address: user.address,
-      floorNumber: user.floorNumber,
-      units: user.units,
-      monthlyCharges: user.monthlyCharges,
-      mobileNumber: user.mobileNumber,
-      alternateMobileNumber: user.alternateMobileNumber,
-      certificateIssued: user.certificateIssued,
-      isActive: user.isActive,
-    });
-  };
-
-  const closeModal = () => {
-    setEditUserId(null);
-    setShowPopup(false); // Hide popup on modal close
-  };
-
-  const handleUpdate = async () => {
-    if (editUserId) {
-      try {
-        await axios.put(`/api/list/${editUserId}`, editUser);
-        triggerPopup(); // Show popup on success
-        closeModal();
-        getList(); // Refresh the list after updating
-      } catch (error) {
-        console.error("Error updating user:", error);
-      }
+        if (aField < bField) return sortConfig.direction === "asc" ? -1 : 1;
+        if (aField > bField) return sortConfig.direction === "asc" ? 1 : -1;
+        return 0;
+      });
     }
+
+    setFilteredUsers(filtered);
+  }, [users, filterName, filterStatus, filterContact, filterDob, sortConfig]);
+
+  const requestSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEditUser((prevUser) => ({
-      ...prevUser,
-      [name]: value,
-    }));
+  const getSortIndicator = (key) => {
+    if (sortConfig.key === key) {
+      return sortConfig.direction === "asc" ? "▲" : "▼";
+    }
+    return "";
   };
 
-  const triggerPopup = () => {
-    setShowPopup(true);
-    setTimeout(() => setShowPopup(false), 3000); // Hide popup after 3 seconds
-  };
+  if (loading) {
+    return <div className="text-center mt-10">Loading...</div>;
+  }
 
-  const clearFilters = () => {
-    setNameFilter("");
-    setDobFilter("");
-    setMobileFilter("");
-    setStatusFilter("");
-  };
+  if (error) {
+    return <div className="text-center text-red-500 mt-10">{error}</div>;
+  }
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-4xl font-extrabold mb-6 text-center text-gray-800">
-        Residents Data
+      <h1 className="text-4xl text-black font-bold mb-6 text-center">
+        Resident Data
       </h1>
 
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search by name"
-          value={nameFilter}
-          onChange={handleNameChange}
-          className="w-full md:w-1/4 p-3 rounded-md border text-black border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <input
-          type="date"
-          value={dobFilter}
-          onChange={handleDobChange}
-          className="w-full md:w-1/4 p-3 rounded-md border text-black border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <input
-          type="text"
-          placeholder="Search by Mobile Number"
-          value={mobileFilter}
-          onChange={handleMobileChange}
-          className="w-full md:w-1/4 p-3 rounded-md border border-gray-300 text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="w-full md:w-1/4 p-3 rounded-md border text-black border-gray-300 shadow-sm focus:outline-none focus:border-blue-500"
-        >
-          <option value="">All Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
+      {/* Filters */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Filter by Name */}
+        <div className="flex flex-col">
+          <label className="font-medium text-gray-700">Filter by Name</label>
+          <input
+            type="text"
+            value={filterName}
+            onChange={(e) => setFilterName(e.target.value)}
+            placeholder="Enter name"
+            className="mt-1 p-2 border rounded-md placeholder-gray-400 text-black"
+          />
+        </div>
+
+        {/* Filter by Status */}
+        <div className="flex flex-col">
+          <label className="font-medium text-gray-700">Filter by Status</label>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="mt-1 p-2 border rounded-md text-black"
+          >
+            <option value="All">All</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+
+        {/* Filter by Contact */}
+        <div className="flex flex-col">
+          <label className="font-medium text-gray-700">Filter by Contact</label>
+          <input
+            type="text"
+            value={filterContact}
+            onChange={(e) => setFilterContact(e.target.value)}
+            placeholder="Enter contact number"
+            className="mt-1 p-2 border rounded-md placeholder-gray-400 text-black"
+          />
+        </div>
+
+        {/* Filter by Date of Birth */}
+        <div className="flex flex-col">
+          <label className="font-medium text-gray-700">
+            Filter by Date of Birth
+          </label>
+          <input
+            type="date"
+            value={filterDob}
+            onChange={(e) => setFilterDob(e.target.value)}
+            className="mt-1 p-2 border rounded-md text-black"
+          />
+        </div>
       </div>
 
-      <div className="mb-6 text-center">
-        <button
-          onClick={clearFilters}
-          className="mx-2 px-4 py-2 rounded bg-blue-500 text-white transition duration-300"
-        >
-          Clear Filters
-        </button>
-      </div>
-
-      {/* Responsive Table */}
-      <div className="overflow-auto rounded-lg shadow-lg max-h-[550px]">
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr className="text-left text-gray-700 font-semibold uppercase bg-gray-200">
-              <th className="p-3">Status</th>
+      {/* Users Table */}
+      <div className="overflow-x-auto rounded-lg">
+        <table className="min-w-full bg-white border text-black rounded-sm">
+          <thead className="py-3">
+            <tr className="text-gray-700 font-bold border-b bg-gray-200 py-3 text-start text-lg uppercase">
+              <th className="text-start px-4 py-2">Status</th>
               <th
-                className="p-3 flex items-center cursor-pointer"
-                onClick={handleSortByName}
+                className="text-start px-4 py-2 cursor-pointer relative"
+                onClick={() => requestSort("Name")}
               >
-                Name
-                {sortOrder === "asc" ? (
-                  <AiOutlineArrowUp className="ml-2" />
-                ) : (
-                  <AiOutlineArrowDown className="ml-2" />
-                )}
+                Name {getSortIndicator("Name")}
               </th>
-              <th className="p-3">Date of Birth</th>
-              <th className="p-3">Contact</th>
-              <th className="p-3">Actions</th>
+              <th
+                className="text-start px-4 py-2 cursor-pointer relative"
+                onClick={() => requestSort("Contact")}
+              >
+                Contact {getSortIndicator("Contact")}
+              </th>
+              <th
+                className="text-start px-4 py-2 cursor-pointer relative"
+                onClick={() => requestSort("Date of Birth")}
+              >
+                Date of Birth {getSortIndicator("Date of Birth")}
+              </th>
+              <th className="text-start px-4 py-2">Action</th>
             </tr>
           </thead>
           <tbody>
-            {filteredData.length > 0 ? (
-              filteredData.map((item) => (
-                <tr key={item._id} className="border-b hover:bg-gray-100">
-                  <td className="p-3 text-black">
-                    <span
-                      className={`inline-block w-3 h-3 rounded-full ${
-                        item.isActive ? "bg-green-500" : "bg-red-500"
-                      }`}
-                    ></span>
+            {filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => (
+                <tr key={user._id} className="border-b hover:bg-gray-100">
+                  <td className="p-3 text-center">
+                    <StatusIndicator
+                      status={user.isActive ? "Completed" : "Failed"}
+                    />
                   </td>
-                  <td className="p-3 text-black">{item.name}</td>
+                  <td className="p-3 text-black">{user.name}</td>
+                  <td className="p-3 text-black">{user.mobileNumber}</td>
                   <td className="p-3 text-black">
-                    {new Date(item.dateOfBirth).toLocaleDateString("en-GB")}
+                    {new Date(user.dateOfBirth).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
                   </td>
-                  <td className="p-3 text-black">{item.mobileNumber}</td>
                   <td className="p-3">
-                    <button
-                      onClick={() => handleEditClick(item)}
-                      className="text-blue-500 hover:text-blue-700 flex items-center space-x-1"
-                    >
-                      {/* <AiFillEdit /> */}
-                      <span>View</span>
-                    </button>
+                    <Link href={`/View/${user._id}`}>
+                      <button className="flex items-center text-blue-500 hover:text-blue-700">
+                        View
+                      </button>
+                    </Link>
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td colSpan="5" className="text-center p-3 text-gray-500">
-                  No data available
+                  No users found
                 </td>
               </tr>
             )}
@@ -276,33 +274,10 @@ const List = () => {
         </table>
       </div>
 
-      {/* Popup Message */}
-      {editUserId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="w-4/5">
-            <div className="relative">
-              <Form
-                data={editUser}
-                updatelist={getList}
-                onChange={handleChange}
-                closeModal={closeModal}
-                triggerPopup={triggerPopup}
-              />
-              <button
-                onClick={closeModal}
-                className="absolute top-12 right-64 text-gray-600 hover:text-gray-800"
-              >
-                <AiOutlineClose size={24} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Success Popup */}
-      {showPopup && <PopUP />}
+      {/* Popup Notification */}
+      {showPopup && <PopUp message={popupMessage} />}
     </div>
   );
 };
 
-export default List;
+export default ViewPage;

@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import Form from "../Add/Form";
+import Form from "../New/Form";
 import {
   AiOutlineClose,
   AiFillEdit,
@@ -58,7 +58,7 @@ const List = () => {
       console.error("Data is not an array:", data);
       return; // Exit the function if data is not an array
     }
-    
+
     let filtered = [...data]; // Create a copy of data to filter
 
     if (nameFilter) {
@@ -135,27 +135,6 @@ const List = () => {
   const closeModal = () => {
     setEditUserId(null);
     setShowPopup(false); // Hide popup on modal close
-  };
-
-  const handleUpdate = async () => {
-    if (editUserId) {
-      try {
-        await axios.put(`/api/list/${editUserId}`, editUser);
-        triggerPopup(); // Show popup on success
-        closeModal();
-        getList(); // Refresh the list after updating
-      } catch (error) {
-        console.error("Error updating user:", error);
-      }
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEditUser((prevUser) => ({
-      ...prevUser,
-      [name]: value,
-    }));
   };
 
   const triggerPopup = () => {
@@ -277,21 +256,21 @@ const List = () => {
         </table>
       </div>
 
-      {/* Popup Message */}
+      {/* Edit Modal */}
       {editUserId && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="w-4/5">
             <div className="relative">
               <Form
                 data={editUser}
+                mode="edit"
                 updatelist={getList}
-                onChange={handleChange}
                 closeModal={closeModal}
                 triggerPopup={triggerPopup}
               />
               <button
                 onClick={closeModal}
-                className="absolute top-12 right-64 text-gray-600 hover:text-gray-800"
+                className="absolute top-12 right-12 text-gray-600 hover:text-gray-800"
               >
                 <AiOutlineClose size={24} />
               </button>

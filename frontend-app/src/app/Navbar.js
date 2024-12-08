@@ -35,11 +35,11 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-8">
             <Link
-              href="/Add"
+              href="/New"
               className="flex items-center space-x-2 text-gray-800 border-b-2 border-transparent hover:border-blue-800"
             >
               <FaPlus className="transition-transform duration-300 hover:scale-105 hover:-translate-y-0.5" />
-              <span className="font-bold">Add</span>
+              <span className="font-bold">New Record</span>
             </Link>
 
             <Link
@@ -51,11 +51,11 @@ const Navbar = () => {
             </Link>
 
             <Link
-              href="/Update"
+              href="/Edit"
               className="flex items-center space-x-2 text-gray-800 border-b-2 border-transparent hover:border-blue-800"
             >
               <FaEdit className="transition-transform duration-300 hover:scale-105 hover:-translate-y-0.5" />
-              <span className="font-bold">Update</span>
+              <span className="font-bold">Edit</span>
             </Link>
 
             <Link
@@ -91,11 +91,11 @@ const Navbar = () => {
         {menuOpen && (
           <div className="md:hidden mt-4 space-y-4">
             <Link
-              href="/Add"
+              href="/New"
               className="block text-gray-800 hover:text-gray-600"
               onClick={() => setMenuOpen(false)}
             >
-              Add
+              New Record
             </Link>
             <Link
               href="/View"

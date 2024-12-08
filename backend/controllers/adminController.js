@@ -22,7 +22,15 @@ exports.getAllAdmins = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
+//get admin by email
+exports.getAdminByEmail = async (req, res) => {
+  try {
+    const admin = await Admin.findOne({ email: req.params.email });
+    res.status(200).json(admin);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 // Delete an admin by ID
 exports.deleteAdmin = async (req, res) => {
   try {

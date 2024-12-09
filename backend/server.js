@@ -7,7 +7,7 @@ const userRoutes = require("./routes/userRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
 const adminRoutes = require("./routes/adminRouter");
 const rentRateRoutes = require("./routes/rentRateRouter");
-
+const discountRoutes = require("./routes/discountRouter");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -41,6 +41,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/admins", adminRoutes);
 app.use("/api/rent-rates", rentRateRoutes);
+app.use("/api/discounts", discountRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

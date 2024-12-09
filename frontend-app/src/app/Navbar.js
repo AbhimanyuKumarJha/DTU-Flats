@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import {
@@ -69,13 +69,21 @@ const Navbar = () => {
 
           {/* User Profile/Logout */}
           <div className="hidden md:flex items-center space-x-4">
-            <button
+            {/* <button
               onClick={() => signOut({ callbackUrl: "/Login" })}
               className="flex items-center space-x-2 text-gray-800 hover:text-gray-600"
             >
               <FaUser />
               <span>Logout</span>
-            </button>
+            </button> */}
+
+            <Link
+              href="/Dashboard"
+              className="flex items-center space-x-2 text-gray-800 hover:text-gray-600"
+            >
+              <FaUser />
+              <span>Dashboard</span>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -105,11 +113,11 @@ const Navbar = () => {
               View
             </Link>
             <Link
-              href="/Update"
+              href="/Edit"
               className="block text-gray-800 hover:text-gray-600"
               onClick={() => setMenuOpen(false)}
             >
-              Update
+              Edit
             </Link>
             <Link
               href="/Transaction"
@@ -118,12 +126,20 @@ const Navbar = () => {
             >
               Transaction
             </Link>
-            <button
+
+            <Link
+              href="/Dashboard"
+              className="block text-gray-800 hover:text-gray-600"
+              onClick={() => setMenuOpen(false)}
+            >
+              Dashboard
+            </Link>
+            {/* <button
               onClick={() => signOut({ callbackUrl: "/Login" })}
               className="block text-gray-800 hover:text-gray-600"
             >
               Logout
-            </button>
+            </button> */}
           </div>
         )}
       </div>

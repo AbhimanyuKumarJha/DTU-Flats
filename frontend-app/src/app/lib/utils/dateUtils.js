@@ -37,3 +37,13 @@ export const formatDate = (date) => {
     day: "numeric",
   });
 };
+
+export const getNextMonthYear = (currentMonth, currentYear) => {
+  let nextMonth = currentMonth + 1;
+  let nextYear = currentYear;
+  if (nextMonth > 12) {
+    nextMonth = 1;
+    nextYear += 1;
+  }
+  return { month: nextMonth, year: nextYear };
+};

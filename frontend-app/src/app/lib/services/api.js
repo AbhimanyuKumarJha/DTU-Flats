@@ -117,6 +117,106 @@ const api = {
       throw new Error(error.response?.data?.error || "Error updating user");
     }
   },
+
+  getAllAdmins: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/admins`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || "Error fetching admin list"
+      );
+    }
+  },
+
+  getAdminByEmail: async (email) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/admins /${email}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || "Error fetching admin");
+    }
+  },
+
+  createAdmin: async (adminData) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/admins`, adminData);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || "Error creating admin");
+    }
+  },
+  deleteAdmin: async (adminId) => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/admins/${adminId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || "Error deleting admin");
+    }
+  },
+  createRentRate: async (rentRateData) => {
+    try {
+      const response = await axios.post(`${BASE_URL}/rent-rates`, rentRateData);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || "Error creating rent rate"
+      );
+    }
+  },
+  deleteRentRate: async (rentRateId) => {
+    try {
+      const response = await axios.delete(
+        `${BASE_URL}/rent-rates/${rentRateId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || "Error deleting rent rate"
+      );
+    }
+  },
+  getAllRentRates: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/rent-rates`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || "Error fetching rent rates"
+      );
+    }
+  },
+  getRentRateById: async (rentRateId) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/rent-rates/${rentRateId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || "Error fetching rent rate"
+      );
+    }
+  },
+  updateDiscount: async (discountId, discountData) => {
+    try {
+      const response = await axios.put(
+        `${BASE_URL}/discounts/${discountId}`,
+        discountData
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || "Error updating discount");
+    }
+  },
+  getDiscount: async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/discounts`);
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || "Error fetching discounts"
+      );
+    }
+  },
 };
 
 export default api;

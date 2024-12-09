@@ -1,159 +1,12 @@
-"use client";
-import { useState, useEffect } from "react";
-import { FaMoneyBillWave, FaPlus, FaTrash } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { FaTrash } from "react-icons/fa";
+import { useRentCalculation } from "../lib/hooks/useRentCalculation";
 import {
   PAYMENT_MODES,
   TRANSACTION_STATUS,
-} from "../../lib/constants/formConstants";
-import { useRentCalculation } from "../../lib/hooks/useRentCalculation";
+} from "../lib/constants/formConstants";
 
-const TransactionForm = ({
-  userId,
-  onSubmit,
-  existingTransactions = [],
-  mode = "create",
-}) => {
-  const [transactions, setTransactions] = useState([]);
-
-  useEffect(() => {
-    if (mode === "edit" && existingTransactions.length > 0) {
-      // Initialize transactions with existing data
-      setTransactions(existingTransactions);
-    }
-  }, [mode, existingTransactions]);
-
-  const addNewTransaction = () => {
-    const lastTransaction = transactions[transactions.length - 1]; // Get the last transaction
-    let nextFromMonth = "";
-    let nextFromYear = "";
-
-    if (lastTransaction) {
-      const lastTillDate = new Date(
-        lastTransaction.tillYear,
-        lastTransaction.tillMonth - 1
-      );
-      const nextMonthDate = new Date(
-        lastTillDate.setMonth(lastTillDate.getMonth() + 1)
-      );
-      nextFromMonth = (nextMonthDate.getMonth() + 1).toString();
-      nextFromYear = nextMonthDate.getFullYear().toString();
-    }
-
-    setTransactions((prev) => [
-      {
-        fromMonth: nextFromMonth, // Pre-filled based on last transaction
-        fromYear: nextFromYear,
-        tillMonth: (new Date().getMonth() + 1).toString(),
-        tillYear: new Date().getFullYear().toString(),
-        paymentMode: PAYMENT_MODES.CASH,
-        paymentDetails: {
-          chequeOrDDNumber: "",
-          upiTransactionId: "",
-        },
-        status:
-          PAYMENT_MODES.CASH === "Cash"
-            ? TRANSACTION_STATUS.COMPLETED
-            : TRANSACTION_STATUS.PENDING,
-        calculatedAmount: 0,
-        monthsPaid: [],
-      },
-      ...prev,
-    ]);
-  };
-
-  const removeTransaction = (index) => {
-    setTransactions((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSubmitAll = async (e) => {
-    e.preventDefault();
-
-    // Validate that all transactions have required fields
-    const isValid = transactions.every((transaction) => {
-      return (
-        transaction.fromMonth &&
-        transaction.fromYear &&
-        transaction.tillMonth &&
-        transaction.tillYear &&
-        transaction.calculatedAmount > 0 &&
-        transaction.monthsPaid &&
-        transaction.monthsPaid.length > 0 &&
-        transaction.paymentMode
-      );
-    });
-
-    if (!isValid) {
-      alert("Please fill in all required fields for all transactions");
-      return;
-    }
-
-    // Format transactions for submission
-    const formattedTransactions = transactions.map((transaction) => ({
-      monthsPaid: transaction.monthsPaid,
-      calculatedAmount: transaction.calculatedAmount,
-      paymentMode: transaction.paymentMode,
-      paymentDetails: {
-        chequeOrDDNumber:
-          transaction.paymentDetails.chequeOrDDNumber || undefined,
-        upiTransactionId:
-          transaction.paymentDetails.upiTransactionId || undefined,
-      },
-      status: transaction.status,
-    }));
-
-    // Debugging: Check the formatted transactions
-    console.log("Formatted Transactions:", formattedTransactions);
-
-    onSubmit({ userId, transactions: formattedTransactions });
-  };
-
-  return (
-    <div className="space-y-6 text-black">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Transactions</h2>
-        <button
-          type="button"
-          onClick={addNewTransaction}
-          className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-        >
-          <FaPlus /> New Transaction
-        </button>
-      </div>
-
-      <form onSubmit={handleSubmitAll} className="space-y-6">
-        {transactions.map((transaction, index) => (
-          <TransactionCard
-            key={index}
-            transaction={transaction}
-            index={index}
-            isFirst={index === transactions.length - 1}
-            onUpdate={(updatedTransaction) => {
-              setTransactions((prev) =>
-                prev.map((t, i) => (i === index ? updatedTransaction : t))
-              );
-            }}
-            onRemove={() => removeTransaction(index)}
-            isOnly={transactions.length === 1}
-            mode={mode}
-          />
-        ))}
-
-        {transactions.length === 0 && (
-          <p className="text-gray-500">No transactions added yet.</p>
-        )}
-
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-        >
-          Submit All Transactions
-        </button>
-      </form>
-    </div>
-  );
-};
-
-export const TransactionCard = ({
+const PaymentCard = ({
   transaction,
   index,
   isFirst,
@@ -162,21 +15,30 @@ export const TransactionCard = ({
   isOnly,
   mode,
 }) => {
+  const [fromMonth, setFromMonth] = useState(transaction.fromMonth);
+  const [fromYear, setFromYear] = useState(transaction.fromYear);
+  const [tillMonth, setTillMonth] = useState(transaction.tillMonth);
+  const [tillYear, setTillYear] = useState(transaction.tillYear);
+
   const { calculatedAmount, monthsPaid } = useRentCalculation(
-    transaction.fromMonth,
-    transaction.fromYear,
-    transaction.tillMonth,
-    transaction.tillYear,
+    fromMonth,
+    fromYear,
+    tillMonth,
+    tillYear,
     1000
   );
 
   useEffect(() => {
     onUpdate({
       ...transaction,
+      fromMonth,
+      fromYear,
+      tillMonth,
+      tillYear,
       calculatedAmount,
       monthsPaid,
     });
-  }, [calculatedAmount, monthsPaid]);
+  }, [fromMonth, fromYear, tillMonth, tillYear, calculatedAmount, monthsPaid]);
 
   const handlePaymentModeChange = (mode) => {
     let defaultStatus;
@@ -226,21 +88,15 @@ export const TransactionCard = ({
           <input
             type="month"
             value={
-              transaction.fromYear && transaction.fromMonth
-                ? `${transaction.fromYear}-${String(
-                    transaction.fromMonth
-                  ).padStart(2, "0")}`
+              fromYear && fromMonth
+                ? `${fromYear}-${String(fromMonth).padStart(2, "0")}`
                 : ""
             }
             onChange={(e) => {
               const [year, month] = e.target.value.split("-");
-              onUpdate({
-                ...transaction,
-                fromMonth: month,
-                fromYear: year,
-              });
+              setFromYear(year);
+              setFromMonth(month);
             }}
-            // disabled={mode === "edit" && index < existingTransactions.length}
             className={`mt-1 p-2 border rounded-md ${
               mode === "edit" && index < existingTransactions.length
                 ? "bg-gray-100"
@@ -254,19 +110,14 @@ export const TransactionCard = ({
           <input
             type="month"
             value={
-              transaction.tillYear && transaction.tillMonth
-                ? `${transaction.tillYear}-${String(
-                    transaction.tillMonth
-                  ).padStart(2, "0")}`
+              tillYear && tillMonth
+                ? `${tillYear}-${String(tillMonth).padStart(2, "0")}`
                 : ""
             }
             onChange={(e) => {
               const [year, month] = e.target.value.split("-");
-              onUpdate({
-                ...transaction,
-                tillMonth: month,
-                tillYear: year,
-              });
+              setTillYear(year);
+              setTillMonth(month);
             }}
             className="mt-1 p-2 border rounded-md"
           />
@@ -373,4 +224,4 @@ export const TransactionCard = ({
   );
 };
 
-export default TransactionForm;
+export default PaymentCard;

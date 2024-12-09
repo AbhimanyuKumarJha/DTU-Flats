@@ -9,7 +9,7 @@ import PopUp from "../utils/popup.jsx";
 const Form = ({
   data,
   mode = "create",
-  updatelist,
+  updatelist = () => {},
   onChange,
   closeModal,
   triggerPopup,
@@ -29,6 +29,22 @@ const Form = ({
     certificateIssued: data?.certificateIssued || "",
   });
   const [errors, setErrors] = useState({});
+  const [existingTransactions, setExistingTransactions] = useState([]);
+
+  useEffect(() => {
+    if (mode === "edit" && userId) {
+      // Fetch existing transactions
+      const fetchTransactions = async () => {
+        try {
+          const transactions = await api.getUserTransactions(userId);
+          setExistingTransactions(transactions);
+        } catch (error) {
+          console.error("Error fetching transactions:", error);
+        }
+      };
+      fetchTransactions();
+    }
+  }, [mode, userId]);
 
   const handleUserSubmit = async (userData) => {
     try {
@@ -52,10 +68,8 @@ const Form = ({
         setUserId(user._id);
         setStep("transaction");
       } else {
-        // For edit mode, refresh the list and close the modal
-        updatelist();
-        closeModal();
-        triggerPopup(); // Show success popup
+        // For edit mode, proceed to transactions
+        setStep("transaction");
       }
     } catch (error) {
       if (error.name === "ZodError") {
@@ -96,8 +110,13 @@ const Form = ({
 
   const handleTransactionSubmit = async (transactionData) => {
     try {
-      // Submit all transactions
-      await api.createTransactions(userId, transactionData.transactions);
+      if (mode === "edit") {
+        // Update existing transactions
+        await api.updateTransactions(userId, transactionData.transactions);
+      } else {
+        // Submit all transactions
+        await api.createTransactions(userId, transactionData.transactions);
+      }
 
       setShowSuccess(true);
       setTimeout(() => {
@@ -118,9 +137,13 @@ const Form = ({
         if (mode === "create") {
           updatelist(); // Refresh the list after creating
         }
+        if (mode === "edit") {
+          triggerPopup(); // Show success popup
+          closeModal();
+        }
       }, 3000);
     } catch (error) {
-      console.error("Error creating transaction:", error);
+      console.error("Error creating/updating transaction:", error);
       alert("Error submitting transactions. Please try again.");
     }
   };
@@ -136,9 +159,14 @@ const Form = ({
           setErrors={setErrors}
         />
       ) : (
-        <TransactionForm userId={userId} onSubmit={handleTransactionSubmit} />
+        <TransactionForm
+          userId={userId}
+          onSubmit={handleTransactionSubmit}
+          existingTransactions={existingTransactions}
+          mode={mode}
+        />
       )}
-      {showSuccess && <PopUp />}
+      {showSuccess && <PopUp message="Transactions updated successfully!" />}
     </div>
   );
 };

@@ -79,3 +79,18 @@ export const transactionSchema = z.object({
     ),
   status: z.enum(Object.values(TRANSACTION_STATUS)),
 });
+
+export const adminSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters"),
+  email: z.string().email("Invalid email address"),
+});
+
+export const rentRateSchema = z.object({
+  rentRate: z.number().positive(),
+  fromDate: z.string().min(1, "From date is required"),
+});
+
+export const discountSchema = z.object({
+  onYear: z.number().positive().min(0).max(100),
+  onFloor: z.number().positive().min(0).max(100),
+});

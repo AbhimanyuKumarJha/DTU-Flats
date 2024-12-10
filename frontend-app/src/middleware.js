@@ -2,6 +2,8 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
 export async function middleware(request) {
+  console.log("Middleware called");
+  console.log(process.env.NEXTAUTH_SECRET);
   const path = request.nextUrl.pathname;
   const token = await getToken({
     req: request,
@@ -36,5 +38,11 @@ export const config = {
     "/Update/:path*",
     "/Transaction/:path*",
     "/Login",
+    "/New",
+    "/New/:path*",
+    "/Transaction/:path*",
+    "/Edit/:path*",
+    "/Dashboard",
+    "/Dashboard/:path*",
   ],
 };

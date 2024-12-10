@@ -7,13 +7,16 @@ export const useRentCalculation = (
   fromYear,
   tillMonth,
   tillYear,
-  baseMonthlyCharge
+  baseMonthlyCharge,
+  isFloorDiscount
 ) => {
   const [rentRates, setRentRates] = useState([]);
   const [calculatedAmount, setCalculatedAmount] = useState(0);
   const [monthsPaid, setMonthsPaid] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [floorDiscount, setFloorDiscount] = useState(0);
+  const [yearDiscount, setYearDiscount] = useState(0);
 
   useEffect(() => {
     fetchRentRates();
@@ -24,6 +27,13 @@ export const useRentCalculation = (
       calculateRent();
     }
   }, [fromMonth, fromYear, tillMonth, tillYear, rentRates]);
+
+  useEffect(() => {
+    api.getDiscount().then((data) => {
+      setFloorDiscount(data[0].onFloor);
+      setYearDiscount(data[0].onYear);
+    });
+  }, []);
 
   const fetchRentRates = async () => {
     try {
@@ -59,6 +69,16 @@ export const useRentCalculation = (
       total += applicableRate ? applicableRate.amount : baseMonthlyCharge;
     });
 
+    if (isFloorDiscount) {
+      total -= (total * floorDiscount) / 100;
+    }
+    if (
+      tillYear - fromYear > 1 ||
+      (tillYear - fromYear === 1 && tillMonth - fromMonth >= -1) ||
+      (tillYear - fromYear === 0 && tillMonth - fromMonth >= 11)
+    ) {
+      total -= (total * yearDiscount) / 100;
+    }
     setCalculatedAmount(total);
     setMonthsPaid(months);
   };

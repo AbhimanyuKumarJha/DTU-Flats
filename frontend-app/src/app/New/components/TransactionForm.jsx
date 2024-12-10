@@ -6,9 +6,10 @@ import {
   TRANSACTION_STATUS,
 } from "../../lib/constants/formConstants";
 import { useRentCalculation } from "../../lib/hooks/useRentCalculation";
-
+import RentDisplay from "../../lib/utils/RentDisplay";
 const TransactionForm = ({
   userId,
+  isFloorDiscount,
   onSubmit,
   existingTransactions = [],
   mode = "create",
@@ -124,6 +125,7 @@ const TransactionForm = ({
         {transactions.map((transaction, index) => (
           <TransactionCard
             key={index}
+            isFloorDiscount={isFloorDiscount}
             transaction={transaction}
             index={index}
             isFirst={index === transactions.length - 1}
@@ -161,15 +163,24 @@ export const TransactionCard = ({
   onRemove,
   isOnly,
   mode,
+  isFloorDiscount,
 }) => {
   const { calculatedAmount, monthsPaid } = useRentCalculation(
     transaction.fromMonth,
     transaction.fromYear,
     transaction.tillMonth,
     transaction.tillYear,
-    1000
+    1000,
+    isFloorDiscount
   );
+  const [showRentDisplay, setShowRentDisplay] = useState(false);
+  const handleRentDisplay = () => {
+    setShowRentDisplay(true);
+  };
 
+  const handleCloseRentDisplay = () => {
+    setShowRentDisplay(false);
+  };
   useEffect(() => {
     onUpdate({
       ...transaction,
@@ -275,9 +286,19 @@ export const TransactionCard = ({
         {/* Calculated Amount Display */}
         <div className="flex flex-col">
           <label className="font-medium text-gray-700">Total Amount</label>
-          <div className="mt-1 p-2 border rounded-md bg-gray-50">
-            ₹{calculatedAmount}
+          <div className="mt-1 p-2 border rounded-md bg-gray-50 flex justify-between">
+            <span>₹{calculatedAmount}</span>
+            <button onClick={handleRentDisplay}>View </button>
           </div>
+          {showRentDisplay && (
+            <RentDisplay
+              fromMonth={transaction.fromMonth}
+              fromYear={transaction.fromYear}
+              tillMonth={transaction.tillMonth}
+              tillYear={transaction.tillYear}
+              onClose={handleCloseRentDisplay}
+            />
+          )}
         </div>
 
         {/* Payment Mode Selection */}

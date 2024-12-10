@@ -161,6 +161,7 @@ const Form = ({
       ) : (
         <TransactionForm
           userId={userId}
+          isFloorDiscount={formData.floorNumber.length === 4 ? true : false}
           onSubmit={handleTransactionSubmit}
           existingTransactions={existingTransactions}
           mode={mode}

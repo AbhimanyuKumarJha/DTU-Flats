@@ -427,12 +427,21 @@ export default function Update() {
                         <div className=" text-black font-semibold">
                           Contact: {selectedUser.mobileNumber}
                         </div>
+                        <div className=" text-black font-semibold">
+                          Floor Number:{" "}
+                          {selectedUser.floorNumber.length === 4 ? "Yes" : "No"}
+                        </div>
                       </div>
 
                       <div className="text-black">
                         {transactions.map((txn, index) => (
                           <PaymentCard
                             key={index}
+                            isFloorDiscount={
+                              selectedUser.floorNumber.length === 4
+                                ? true
+                                : false
+                            }
                             transaction={txn}
                             index={index}
                             isFirst={index === 0}

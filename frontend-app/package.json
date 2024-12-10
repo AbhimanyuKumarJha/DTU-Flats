@@ -11,6 +11,7 @@
   "dependencies": {
     "@auth/core": "^0.37.4",
     "axios": "^1.7.7",
+    "firebase": "^11.0.2",
     "lucide": "^0.454.0",
     "lucide-react": "^0.454.0",
     "mongoose": "^8.8.4",

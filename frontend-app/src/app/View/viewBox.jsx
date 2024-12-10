@@ -21,6 +21,7 @@ const StatusIndicator = ({ status }) => {
     </div>
   );
 };
+let isFloorDiscount = false;
 
 // User Details Card Component
 const UserCard = ({ user }) => {
@@ -36,6 +37,9 @@ const UserCard = ({ user }) => {
     isActive,
   } = user;
 
+  if (floorNumber.length > 3) {
+    isFloorDiscount = true;
+  }
   const formattedDOB = new Date(dateOfBirth).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
@@ -225,6 +229,7 @@ const TransactionCard = ({ transaction, onDownload }) => {
             tillMonth={tillMonth}
             tillYear={tillYear}
             onClose={handleCloseRentDisplay}
+            isFloorDiscount={isFloorDiscount}
           />
         </div>
       )}

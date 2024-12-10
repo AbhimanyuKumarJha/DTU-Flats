@@ -9,7 +9,7 @@ import {
   AiOutlineArrowDown,
 } from "react-icons/ai";
 import PopUP from "../utils/popup";
-
+// import { useRouter } from "next/navigation";
 const List = () => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -46,7 +46,7 @@ const List = () => {
   // Fetch data when the component mounts
   useEffect(() => {
     getList();
-  }, []);
+  }, [editUserId]);
 
   useEffect(() => {
     applyFilters(); // Apply filters whenever data or filters change
@@ -135,6 +135,8 @@ const List = () => {
   const closeModal = () => {
     setEditUserId(null);
     setShowPopup(false); // Hide popup on modal close
+    // on close modal redirect to edit page
+    // refresh data
   };
 
   const triggerPopup = () => {
@@ -259,7 +261,7 @@ const List = () => {
       {/* Edit Modal */}
       {editUserId && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="w-4/5">
+          <div className="w-full">
             <div className="relative">
               <Form
                 data={editUser}

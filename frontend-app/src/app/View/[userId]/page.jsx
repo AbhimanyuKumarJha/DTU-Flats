@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import ViewBox from "../viewBox";
 import PopUp from "../../utils/popup";
 import api from "../../lib/services/api";
-
+import { generateAndDownloadPDF } from "../../lib/utils/pdfGenerator";
 const UserDetailPage = () => {
   const params = useParams();
   const userId = params.userId;
@@ -22,14 +22,25 @@ const UserDetailPage = () => {
 
   const fetchUserData = async () => {
     try {
-      // console.log("Fetching user data for userId:", userId);
-      const userData = await api.getUserById(userId);
-      // console.log("Fetched user data:", userData);
+      const [userData, userTransactions, rentRates, discountData] =
+        await Promise.all([
+          api.getUserById(userId),
+          api.getTransactionsByUserId(userId),
+          api.getRentRates(),
+          api.getDiscount(),
+        ]);
+
       setUser(userData);
 
-      const userTransactions = await api.getTransactionsByUserId(userId);
-      // console.log("Fetched transactions:", userTransactions);
-      setTransactions(userTransactions);
+      // Add rentRates and discounts to each transaction
+      const transactionsWithDetails = userTransactions.map((tx) => ({
+        ...tx,
+        rentRates,
+        floorDiscount: discountData[0]?.onFloor || 0,
+        yearDiscount: discountData[0]?.onYear || 0,
+      }));
+
+      setTransactions(transactionsWithDetails);
     } catch (err) {
       console.error("Error fetching user data:", err);
       setError("Failed to load user data.");
@@ -43,9 +54,45 @@ const UserDetailPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
+  const calculateRentDetails = (transaction) => {
+    const baseMonthlyCharge = 1000;
+    const rentRates = transaction.rentRates || [];
+    const floorDiscount = transaction.floorDiscount || 0;
+    const yearDiscount = transaction.yearDiscount || 0;
+
+    const months = transaction.monthsPaid;
+    let total = 0;
+    const monthlyCalculations = months.map(({ month, year }) => {
+      const date = new Date(year, month - 1);
+      const applicableRate = rentRates.find(
+        (rate) => new Date(rate.effectiveDate) <= date
+      );
+      const amount = applicableRate ? applicableRate.amount : baseMonthlyCharge;
+      total += amount;
+      return { month, year, amount };
+    });
+
+    const floorDiscountAmount = total * (floorDiscount / 100);
+    const yearDiscountAmount = total * (yearDiscount / 100);
+    const grandTotal = total - floorDiscountAmount - yearDiscountAmount;
+
+    return {
+      monthlyCalculations,
+      totalAmount: total,
+      floorDiscount,
+      yearDiscount,
+      floorDiscountAmount,
+      yearDiscountAmount,
+      grandTotal,
+    };
+  };
+
   const handleDownload = (transaction) => {
     // Implement actual download logic here (e.g., generate PDF)
     // For demonstration, we'll show a popup notification
+    const rentDetails = calculateRentDetails(transaction);
+    const transactionWithRentDetails = { ...transaction, rentDetails };
+    generateAndDownloadPDF(transactionWithRentDetails);
     setPopupMessage(
       `Download initiated for Transaction ID: ${transaction._id}`
     );

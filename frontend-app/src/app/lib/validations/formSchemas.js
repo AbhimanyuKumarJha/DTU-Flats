@@ -86,8 +86,8 @@ export const adminSchema = z.object({
 });
 
 export const rentRateSchema = z.object({
-  rentRate: z.number().positive(),
-  fromDate: z.string().min(1, "From date is required"),
+  amount: z.number().positive(),
+  effectiveDate: z.coerce.date(),
 });
 
 export const discountSchema = z.object({

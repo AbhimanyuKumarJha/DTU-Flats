@@ -4,6 +4,7 @@ import { FaFileDownload } from "react-icons/fa";
 import PopUp from "../utils/popup";
 // import { showRentCalculations } from "../lib/utils/showRentCalculations";
 import RentDisplay from "../lib/utils/RentDisplay";
+import { generateAndDownloadPDF } from "../lib/utils/pdfGenerator";
 
 // Status Indicator Component
 const StatusIndicator = ({ status }) => {

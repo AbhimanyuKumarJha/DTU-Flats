@@ -5,12 +5,12 @@ import TransactionForm from "./components/TransactionForm.jsx";
 import api from "../lib/services/api.js";
 import { userSchema } from "../lib/validations/formSchemas.js";
 import PopUp from "../utils/popup.jsx";
+import { redirect } from "next/navigation";
 
 const Form = ({
   data,
   mode = "create",
   updatelist = () => {},
-  onChange,
   closeModal,
   triggerPopup,
 }) => {
@@ -59,6 +59,7 @@ const Form = ({
       if (mode === "edit" && userId) {
         // Update existing user
         user = await api.updateUser(userId, validatedData);
+        // setShowSuccess(true);
       } else {
         // Create new user
         user = await api.createUser(validatedData);
@@ -69,7 +70,8 @@ const Form = ({
         setStep("transaction");
       } else {
         // For edit mode, proceed to transactions
-        setStep("transaction");
+        setStep("finsihed");
+        closeModal();
       }
     } catch (error) {
       if (error.name === "ZodError") {
@@ -159,13 +161,15 @@ const Form = ({
           setErrors={setErrors}
         />
       ) : (
-        <TransactionForm
-          userId={userId}
-          isFloorDiscount={formData.floorNumber.length === 4 ? true : false}
-          onSubmit={handleTransactionSubmit}
-          existingTransactions={existingTransactions}
-          mode={mode}
-        />
+        mode === "create" && (
+          <TransactionForm
+            userId={userId}
+            isFloorDiscount={formData.floorNumber.length === 4 ? true : false}
+            onSubmit={handleTransactionSubmit}
+            existingTransactions={existingTransactions}
+            mode={mode}
+          />
+        )
       )}
       {showSuccess && <PopUp message="Transactions updated successfully!" />}
     </div>

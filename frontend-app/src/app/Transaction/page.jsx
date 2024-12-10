@@ -310,6 +310,10 @@ const TransactionPage = () => {
           />
         </div>
       </div>
+      <div className="flex  text-black font-bold text-lg">
+        {" "}
+        {filteredTransactions.length} Transactions
+      </div>
 
       {/* Transactions Table */}
       {filteredTransactions.length === 0 ? (

@@ -188,6 +188,7 @@ export default function Update() {
   };
 
   const handleAddTransaction = () => {
+    // initailly show from month as latest month and year and till month as current month and year
     setTransactions([
       ...transactions,
       {
@@ -206,10 +207,109 @@ export default function Update() {
 
   const handleTransactionSubmit = async () => {
     try {
-      await api.createTransactions(selectedUser._id, transactions);
+      // Fetch existing transactions for the selected user
+      const transactionsResponse = await api.getTransactionsByUserId(
+        selectedUser._id
+      );
+      const allExistingTransactions = transactionsResponse;
+
+      // Initialize an array to hold transactions that can be submitted
+      const transactionsToSubmit = [];
+      let hasAlreadyPaid = false;
+
+      // Iterate through each transaction to check for already paid months
+      for (let txn of transactions) {
+        const { fromMonth, fromYear, tillMonth, tillYear } = txn;
+
+        // Generate all months covered by the current transaction
+        const monthsCovered = [];
+        let currentMonth = fromMonth;
+        let currentYear = fromYear;
+
+        while (
+          currentYear < tillYear ||
+          (currentYear === tillYear && currentMonth <= tillMonth)
+        ) {
+          monthsCovered.push({ month: currentMonth, year: currentYear });
+          const next = getNextMonthYear(currentMonth, currentYear);
+          currentMonth = next.nextMonth;
+          currentYear = next.nextYear;
+        }
+
+        // Check if any of the months are already paid
+        const alreadyPaidMonths = monthsCovered.filter((m) =>
+          allExistingTransactions.some(
+            (existingTxn) =>
+              existingTxn.monthsPaid.some(
+                (paidMonth) =>
+                  paidMonth.month === m.month && paidMonth.year === m.year
+              ) && existingTxn.status === "Completed"
+          )
+        );
+
+        if (alreadyPaidMonths.length > 0) {
+          hasAlreadyPaid = true;
+          // Find the latest paid month to set the next possible month/year
+          const latestPaid = alreadyPaidMonths.reduce(
+            (prev, current) => {
+              if (current.year > prev.year) return current;
+              if (current.year === prev.year && current.month > prev.month)
+                return current;
+              return prev;
+            },
+            { month: 1, year: 0 }
+          );
+
+          const nextPayment = getNextMonthYear(
+            latestPaid.month,
+            latestPaid.year
+          );
+          txn.fromMonth = nextPayment.nextMonth;
+          txn.fromYear = nextPayment.nextYear;
+
+          // Optionally, you can notify the user about the adjustment
+          setShowPopup(true);
+          setPopupMessage(
+            `Some months are already paid. Adjusting payment to start from ${nextPayment.nextMonth}/${nextPayment.nextYear}.`
+          );
+        }
+
+        // Check if there are any months left to submit after excluding already paid
+        const unpaidMonths = monthsCovered.filter(
+          (m) =>
+            !allExistingTransactions.some(
+              (existingTxn) =>
+                existingTxn.monthsPaid.some(
+                  (paidMonth) =>
+                    paidMonth.month === m.month && paidMonth.year === m.year
+                ) && existingTxn.status === "Completed"
+            )
+        );
+
+        if (unpaidMonths.length > 0) {
+          // Update the transaction's tillMonth and tillYear based on unpaid months
+          const lastUnpaid = unpaidMonths[unpaidMonths.length - 1];
+          txn.tillMonth = lastUnpaid.month;
+          txn.tillYear = lastUnpaid.year;
+          transactionsToSubmit.push(txn);
+        }
+      }
+
+      if (transactionsToSubmit.length === 0) {
+        // If all transactions are already paid
+        if (!hasAlreadyPaid) {
+          setShowPopup(true);
+          setPopupMessage("No new transactions to submit.");
+        }
+        return;
+      }
+
+      // Submit the filtered transactions
+      await api.createTransactions(selectedUser._id, transactionsToSubmit);
       setShowPopup(true);
       setPopupMessage("Transactions added successfully.");
-      // Refresh transactions
+
+      // Refresh existing transactions
       const fetchedTransactions = await api.getTransactionsByUserId(
         selectedUser._id
       );
@@ -428,7 +528,7 @@ export default function Update() {
                           Contact: {selectedUser.mobileNumber}
                         </div>
                         <div className=" text-black font-semibold">
-                          Floor Number:{" "}
+                          Floor discount:{" "}
                           {selectedUser.floorNumber.length === 4 ? "Yes" : "No"}
                         </div>
                       </div>
@@ -458,12 +558,14 @@ export default function Update() {
                             mode="create"
                           />
                         ))}
+                        {/*
+                        //not need to add more than one transaction as we are adding multiple months at once
                         <button
                           className="bg-green-500 text-white px-4 py-2 rounded-md mt-4"
                           onClick={handleAddTransaction}
                         >
                           Add Another Transaction
-                        </button>
+                        </button> */}
                         <button
                           className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 ml-2"
                           onClick={handleTransactionSubmit}

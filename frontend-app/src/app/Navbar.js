@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import {
   FaPlus,
   FaEdit,
@@ -28,8 +29,17 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center">
           {/* Logo/Brand */}
-          <Link href="/" className="text-xl font-bold text-gray-800">
-            DTU FLATS
+          <Link
+            href="/"
+            className="text-xl font-bold text-gray-800 flex items-center space-x-2"
+          >
+            <Image
+              src="/DTU,_Delhi_official_logo.png"
+              alt="DTU FLATS"
+              width={40}
+              height={40}
+            />
+            <span className="text-xl font-bold text-gray-800">DTU FLATS</span>
           </Link>
 
           {/* Desktop Navigation */}

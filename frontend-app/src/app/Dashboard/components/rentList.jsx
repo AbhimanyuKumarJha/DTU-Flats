@@ -8,10 +8,16 @@ const RentList = () => {
   const [rentRate, setRentRate] = useState("");
   const [fromDate, setFromDate] = useState("");
 
-  const validatedRentRate = rentRateSchema.safeParse({
-    amount: rentRate,
-    effectiveDate: fromDate,
-  });
+  const formattedDate = fromDate ? new Date(`${fromDate}-01`) : null;
+
+  const validatedRentRate =
+    fromDate && rentRate
+      ? rentRateSchema.safeParse({
+          amount: Number(rentRate),
+          effectiveDate: formattedDate,
+        })
+      : null;
+
   useEffect(() => {
     api.getAllRentRates().then((data) => setRentList(data));
     // console.log(rentList);
@@ -22,14 +28,28 @@ const RentList = () => {
     });
   };
   const handleAddRentRate = () => {
-    if (validatedRentRate.success) {
-      api.createRentRate(validatedRentRate.data).then((data) => {
-        setRentList([...rentList, data]);
-        setRentRate("");
-        setFromDate("");
-      });
+    if (validatedRentRate?.success) {
+      api
+        .createRentRate({
+          amount: validatedRentRate.data.amount,
+          effectiveDate: formattedDate,
+        })
+        .then((data) => {
+          setRentList([...rentList, data]);
+          setRentRate("");
+          setFromDate("");
+        });
     }
   };
+
+  const formatDisplayDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+    });
+  };
+
   return (
     <div className="flex flex-col items-center  h-full w-full rounded-lg bg-gray-100 p-4 text-gray-800">
       <h1 className="text-2xl font-bold mt-3 mb-3">Rent History</h1>
@@ -43,8 +63,8 @@ const RentList = () => {
             className="h-8 bg-none border-none rounded-md outline-none w-full text-base text-black p-2 "
           />
           <input
-            type="text"
-            placeholder="From Date"
+            type="month"
+            placeholder="From month"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
             className="h-8 bg-none border-none rounded-md outline-none w-full text-base text-black p-2"
@@ -65,7 +85,7 @@ const RentList = () => {
               <b>RentRate:</b> {rent.amount}
             </p>
             <p className="col-span-4">
-              <b>From Date:</b> {rent.effectiveDate}
+              <b>From Date:</b> {formatDisplayDate(rent.effectiveDate)}
             </p>
             <button
               className="bg-red-500 text-white p-2 rounded-md col-span-1 w-fit"

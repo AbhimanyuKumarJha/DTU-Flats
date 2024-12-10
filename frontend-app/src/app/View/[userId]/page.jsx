@@ -10,7 +10,7 @@ const UserDetailPage = () => {
   const params = useParams();
   const userId = params.userId;
 
-  console.log("Navigated to UserDetailPage with userId:", userId);
+  // console.log("Navigated to UserDetailPage with userId:", userId);
 
   const [user, setUser] = useState(null);
   const [transactions, setTransactions] = useState([]);
@@ -22,13 +22,13 @@ const UserDetailPage = () => {
 
   const fetchUserData = async () => {
     try {
-      console.log("Fetching user data for userId:", userId);
+      // console.log("Fetching user data for userId:", userId);
       const userData = await api.getUserById(userId);
-      console.log("Fetched user data:", userData);
+      // console.log("Fetched user data:", userData);
       setUser(userData);
 
       const userTransactions = await api.getTransactionsByUserId(userId);
-      console.log("Fetched transactions:", userTransactions);
+      // console.log("Fetched transactions:", userTransactions);
       setTransactions(userTransactions);
     } catch (err) {
       console.error("Error fetching user data:", err);

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import api from "../lib/services/api";
+import { generateAndDownloadPDF } from "../lib/utils/pdfGenerator"; // Import the PDF generator
 
 // Helper function to get month name from month number
 const getMonthName = (monthNumber) => {
@@ -46,8 +47,20 @@ const TransactionPage = () => {
     const fetchTransactions = async () => {
       try {
         const data = await api.getAllTransactions();
-        setTransactions(data);
-        setFilteredTransactions(data);
+
+        // Fetch rent rates and discounts
+        const rentRates = await api.getRentRates();
+        const discountData = await api.getDiscount();
+
+        const transactionsWithDetails = data.map((tx) => ({
+          ...tx,
+          rentRates,
+          floorDiscount: discountData[0]?.onFloor || 0,
+          yearDiscount: discountData[0]?.onYear || 0,
+        }));
+
+        setTransactions(transactionsWithDetails);
+        setFilteredTransactions(transactionsWithDetails);
       } catch (err) {
         console.error("Error fetching transactions:", err);
         setError("Failed to load transactions.");
@@ -104,6 +117,10 @@ const TransactionPage = () => {
         let aField, bField;
 
         switch (sortConfig.key) {
+          case "Status":
+            aField = a.status || "";
+            bField = b.status || "";
+            break;
           case "Name":
             aField = a.userId?.name || "";
             bField = b.userId?.name || "";
@@ -180,10 +197,49 @@ const TransactionPage = () => {
     );
   };
 
-  const handleDownload = (transaction) => {
-    // Implement your download logic here
-    // Example: Generate a PDF or redirect to a download URL
-    alert(`Download for Transaction ID: ${transaction._id} not implemented.`);
+  // Function to calculate rent details (similar to RentDisplay)
+  const calculateRentDetails = (transaction) => {
+    const baseMonthlyCharge = 1000;
+    const rentRates = transaction.rentRates || [];
+    const floorDiscount = transaction.floorDiscount || 0;
+    const yearDiscount = transaction.yearDiscount || 0;
+
+    const months = transaction.monthsPaid;
+    let total = 0;
+    const monthlyCalculations = months.map(({ month, year }) => {
+      const date = new Date(year, month - 1);
+      const applicableRate = rentRates.find(
+        (rate) => new Date(rate.effectiveDate) <= date
+      );
+      const amount = applicableRate ? applicableRate.amount : baseMonthlyCharge;
+      total += amount;
+      return { month, year, amount };
+    });
+
+    const floorDiscountAmount = total * (floorDiscount / 100);
+    const yearDiscountAmount = total * (yearDiscount / 100);
+    const grandTotal = total - floorDiscountAmount - yearDiscountAmount;
+
+    return {
+      monthlyCalculations,
+      totalAmount: total,
+      floorDiscount,
+      yearDiscount,
+      floorDiscountAmount,
+      yearDiscountAmount,
+      grandTotal,
+    };
+  };
+
+  const handleDownload = async (transaction) => {
+    try {
+      const rentDetails = calculateRentDetails(transaction);
+      const transactionWithRentDetails = { ...transaction, rentDetails };
+      await generateAndDownloadPDF(transactionWithRentDetails);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Failed to generate PDF. Please try again.");
+    }
   };
 
   if (loading) {
@@ -304,8 +360,16 @@ const TransactionPage = () => {
             </thead>
             <tbody>
               {filteredTransactions.map((transaction) => {
-                const { userId, status, monthsPaid, _id, transactionDate } =
-                  transaction;
+                const {
+                  userId,
+                  status,
+                  monthsPaid,
+                  _id,
+                  transactionDate,
+                  rentRates,
+                  floorDiscount,
+                  yearDiscount,
+                } = transaction;
 
                 // Compute From and To dates based on monthsPaid
                 if (!monthsPaid || monthsPaid.length === 0) {

@@ -14,7 +14,7 @@ const RentList = () => {
   });
   useEffect(() => {
     api.getAllRentRates().then((data) => setRentList(data));
-    console.log(rentList);
+    // console.log(rentList);
   }, []);
   const handleDelete = (rentId) => {
     api.deleteRentRate(rentId).then((data) => {

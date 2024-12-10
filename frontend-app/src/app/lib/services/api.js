@@ -36,7 +36,7 @@ const api = {
           ...transaction,
           userId,
         };
-        console.log("Sending Transaction Data:", transactionData);
+        // console.log("Sending Transaction Data:", transactionData);
         return axios.post(`${BASE_URL}/transactions`, transactionData);
       });
 

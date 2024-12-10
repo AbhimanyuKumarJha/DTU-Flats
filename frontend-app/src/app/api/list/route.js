@@ -18,7 +18,7 @@ export async function GET(request) {
     if (mobileNumber) filters.mobileNumber = mobileNumber;
     if (status) filters.isActive = status === "true"; // Convert to boolean if necessary
 
-    const Backend_URI = process.env.BACKEND_URI;
+    const Backend_URI = process.env.NEXT_PUBLIC_BACKEND_URI;
 
     // Make the request to the backend API with filters
     const response = await axios.get(`${Backend_URI}/users`, {

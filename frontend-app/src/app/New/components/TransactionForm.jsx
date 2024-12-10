@@ -103,7 +103,7 @@ const TransactionForm = ({
     }));
 
     // Debugging: Check the formatted transactions
-    console.log("Formatted Transactions:", formattedTransactions);
+    // console.log("Formatted Transactions:", formattedTransactions);
 
     onSubmit({ userId, transactions: formattedTransactions });
   };

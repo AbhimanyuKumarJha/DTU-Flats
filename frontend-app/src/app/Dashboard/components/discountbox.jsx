@@ -24,7 +24,7 @@ const DiscountBox = () => {
     if (validatedDiscount.success) {
       api.updateDiscount(discountId, validatedDiscount.data).then((data) => {
         setIsEditing(false);
-        console.log(isEditing);
+        // console.log(isEditing);
       });
     } else {
       console.log("Invalid discount");

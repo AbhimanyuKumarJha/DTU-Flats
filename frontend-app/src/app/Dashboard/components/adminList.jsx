@@ -14,7 +14,7 @@ const AdminList = () => {
   });
   useEffect(() => {
     api.getAllAdmins().then((data) => setAdminList(data));
-    console.log(adminList);
+    // console.log(adminList);
   }, []);
   const handleDelete = (adminId) => {
     api.deleteAdmin(adminId).then((data) => {

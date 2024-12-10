@@ -10,6 +10,8 @@ export async function middleware(request) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
+  console.log("token", token);
+
   // Public paths that don't require authentication
   const publicPaths = ["/Login"];
 

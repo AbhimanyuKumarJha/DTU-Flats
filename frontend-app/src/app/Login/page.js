@@ -39,7 +39,7 @@ const LoginPage = () => {
             Welcome to DTU FLATS
           </h2>
           <p className="text-gray-500 mt-2">
-            Bridging Memories, Building Futures
+            This the beta version of DTU FLATS.
           </p>
         </div>
 

@@ -397,4 +397,3 @@ export const TransactionCard = ({
 };
 
 export default TransactionForm;
-`

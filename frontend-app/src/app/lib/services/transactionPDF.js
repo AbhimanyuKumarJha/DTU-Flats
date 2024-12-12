@@ -183,7 +183,7 @@ const TransactionDocument = ({ transaction, rentDetails }) => {
                   )}{" "}
                   {year}:
                 </Text>
-                <Text>₹{amount.toFixed(2)}</Text>
+                <Text>{amount.toFixed(2)}</Text>
               </View>
             ))}
             {/* Total */}
@@ -191,7 +191,7 @@ const TransactionDocument = ({ transaction, rentDetails }) => {
               <View style={styles.rentItem}>
                 <Text style={{ fontWeight: "bold" }}>Total:</Text>
                 <Text style={{ fontWeight: "bold" }}>
-                  ₹{rentDetails.totalAmount.toFixed(2)}
+                  {rentDetails.totalAmount.toFixed(2)}
                 </Text>
               </View>
               <View style={styles.rentItem}>
@@ -200,7 +200,7 @@ const TransactionDocument = ({ transaction, rentDetails }) => {
                   {rentDetails.floorDiscount ? rentDetails.floorDiscount : 0}%
                 </Text>
                 <Text style={{ fontWeight: "bold" }}>
-                  ₹{rentDetails.floorDiscountAmount.toFixed(2)}
+                  {rentDetails.floorDiscountAmount.toFixed(2)}
                 </Text>
               </View>
               <View style={styles.rentItem}>
@@ -209,13 +209,13 @@ const TransactionDocument = ({ transaction, rentDetails }) => {
                   {rentDetails.yearDiscount ? rentDetails.yearDiscount : 0}%
                 </Text>
                 <Text style={{ fontWeight: "bold" }}>
-                  ₹{rentDetails.yearDiscountAmount.toFixed(2)}
+                  {rentDetails.yearDiscountAmount.toFixed(2)}
                 </Text>
               </View>
               <View style={styles.rentItem}>
                 <Text style={{ fontWeight: "bold" }}>Grand Total:</Text>
                 <Text style={{ fontWeight: "bold" }}>
-                  ₹{rentDetails.grandTotal.toFixed(2)}
+                  {rentDetails.grandTotal.toFixed(2)}
                 </Text>
               </View>
             </View>

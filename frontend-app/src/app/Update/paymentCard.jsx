@@ -34,7 +34,7 @@ const PaymentCard = ({
     fromYear,
     tillMonth,
     tillYear,
-    1000,
+    0,
     isFloorDiscount
   );
 
@@ -147,6 +147,7 @@ const PaymentCard = ({
               tillMonth={tillMonth}
               tillYear={tillYear}
               onClose={handleCloseRentDisplay}
+              isFloorDiscount={isFloorDiscount}
             />
           )}
         </div>

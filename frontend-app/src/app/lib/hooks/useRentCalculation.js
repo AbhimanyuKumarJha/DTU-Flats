@@ -69,15 +69,17 @@ export const useRentCalculation = (
       total += applicableRate ? applicableRate.amount : baseMonthlyCharge;
     });
 
+    let floorDiscountAmount = (total * floorDiscount) / 100;
+    let yearDiscountAmount = (total * yearDiscount) / 100;
     if (isFloorDiscount) {
-      total -= (total * floorDiscount) / 100;
+      total -= floorDiscountAmount;
     }
     if (
       tillYear - fromYear > 1 ||
       (tillYear - fromYear === 1 && tillMonth - fromMonth >= -1) ||
       (tillYear - fromYear === 0 && tillMonth - fromMonth >= 11)
     ) {
-      total -= (total * yearDiscount) / 100;
+      total -= yearDiscountAmount;
     }
     setCalculatedAmount(total);
     setMonthsPaid(months);

@@ -174,7 +174,8 @@ export const TransactionCard = ({
     isFloorDiscount
   );
   const [showRentDisplay, setShowRentDisplay] = useState(false);
-  const handleRentDisplay = () => {
+  const handleRentDisplay = (e) => {
+    e.preventDefault();
     setShowRentDisplay(true);
   };
 

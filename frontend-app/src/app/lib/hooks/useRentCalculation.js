@@ -15,8 +15,8 @@ export const useRentCalculation = (
   const [monthsPaid, setMonthsPaid] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [floorDiscount, setFloorDiscount] = useState(0);
-  const [yearDiscount, setYearDiscount] = useState(0);
+  const [floorDiscount, setFloorDiscount] = useState(6);
+  const [yearDiscount, setYearDiscount] = useState(5);
 
   useEffect(() => {
     fetchRentRates();

@@ -87,21 +87,18 @@ const UserDetailPage = () => {
     };
   };
 
-  const handleDownload = (transaction) => {
-    // Implement actual download logic here (e.g., generate PDF)
-    // For demonstration, we'll show a popup notification
-    const rentDetails = calculateRentDetails(transaction);
-    const transactionWithRentDetails = { ...transaction, rentDetails };
-    generateAndDownloadPDF(transactionWithRentDetails);
-    setPopupMessage(
-      `Download initiated for Transaction ID: ${transaction._id}`
-    );
-    setShowPopup(true);
-
-    // Hide popup after 3 seconds
-    setTimeout(() => {
-      setShowPopup(false);
-    }, 3000);
+  const handleDownload = async (transaction) => {
+    try {
+      // Fetch user data using the userId from the transaction
+      const userData = await api.getUserById(transaction.userId._id);
+      console.log("handledownload userdata",userData);
+      const rentDetails = calculateRentDetails(transaction);
+      const transactionWithRentDetails = { ...transaction, rentDetails, userData }; // Include user data
+      await generateAndDownloadPDF(transactionWithRentDetails);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Failed to generate PDF. Please try again.");
+    }
   };
 
   if (error) {

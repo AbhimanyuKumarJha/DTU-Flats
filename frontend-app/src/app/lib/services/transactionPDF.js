@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import {
   Document,
   Page,
@@ -8,6 +8,8 @@ import {
   Image,
   Font,
 } from "@react-pdf/renderer";
+import api from './api'; // Import the API
+import { set } from "zod";
 
 Font.register({
   family: "Helvetica",
@@ -75,8 +77,50 @@ const styles = StyleSheet.create({
   },
 });
 
-const TransactionDocument = ({ transaction, rentDetails }) => {
-  const { userId, status, monthsPaid, transactionDate, _id } = transaction;
+const TransactionDocument = ({ transaction, rentDetails, userData }) => {
+  const { userId, status, monthsPaid, transactionDate, _id , floorNumber , userDataset} = transaction;
+
+  // State to hold user data
+  const [numberOfFloors, setNumberOfFloors] = useState(0);
+  const [floorDiscountState, setFloorDiscount] = useState(0);
+
+  // Fetch user data by userId
+  React.useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const user = await api.getUserById(userId._id); // Assuming userId is an object with _id
+        console.log("Fetched User Data:", user);
+
+        // Ensure floorNumber is processed correctly
+        const floorCount = Array.isArray(user.floorNumber) ? user.floorNumber.length : 0;
+        // console.log("Processed floorNumber length:", floorCount);
+
+        console.log("Processed floorNumber length:", floorCount);
+        const numberOfFloors = floorCount;
+        setNumberOfFloors(floorCount); // Update number of floors state
+        console.log(numberOfFloors);
+        const floorDiscountState = numberOfFloors === 4 ? rentDetails.floorDiscount : 0
+        setFloorDiscount(floorDiscountState)
+        console.log("floor discount state:",floorDiscountState);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [userId      ]); // Dependency array to run effect when userId changes
+
+  // Destructure rentDetails
+  const { monthlyCalculations, totalAmount } = rentDetails || {};
+
+  // Calculate discounts
+  const floorDiscount = userData.floorNumber.length === 4 ? rentDetails.floorDiscount : 0; // Assuming 10% discount for 4 floors
+  const floorDiscountAmount = (totalAmount * floorDiscount) / 100; // Calculate floor discount amount
+  const yearDisc = monthsPaid.length >= 12 ? rentDetails.yearDiscount : 0; // Assuming 5% discount for 12 or more months
+  const yearDiscountAmt = (totalAmount * yearDisc) / 100; // Calculate year discount amount
+
+  // Calculate grand total without discounts
+  const grandTotal = totalAmount-yearDiscountAmt-floorDiscountAmount; // Grand total is total without deducting discounts
 
   const getMonthName = (monthNumber) => {
     const date = new Date();
@@ -101,14 +145,25 @@ const TransactionDocument = ({ transaction, rentDetails }) => {
     hour: "2-digit",
     minute: "2-digit",
   });
-
+  console.log("user data " , userData);
   return (
+    
+    
     <Document>
       <Page style={styles.page}>
         {/* Top-Centered Logo */}
         <Image src="/DTU,_Delhi_official_logo.png" style={styles.logo} />
 
         <Text style={styles.header}>Transaction Details</Text>
+
+        {/* Display number of floors */}
+        <View style={styles.userDetailsContainer}>
+          <View style={styles.userColumn}>
+            <Text style={styles.label}>Number of Floors:</Text>
+            
+            <Text>{userData.floorNumber !== null ? userData.floorNumber.length: "N/A"}</Text>
+          </View>
+        </View>
 
         {/* User Details in Rows */}
         <View style={styles.userDetailsContainer}>
@@ -150,9 +205,9 @@ const TransactionDocument = ({ transaction, rentDetails }) => {
 
         {/* Rent Details */}
         <Text style={styles.rentHeader}>Rent Details</Text>
-        {rentDetails && rentDetails.monthlyCalculations && (
+        {monthlyCalculations && (
           <View>
-            {rentDetails.monthlyCalculations.map(({ month, year, amount }, index) => (
+            {monthlyCalculations.map(({ month, year, amount }, index) => (
               <View key={`${month}-${year}-${index}`} style={styles.rentItem}>
                 <Text>
                   {new Intl.DateTimeFormat("en-US", { month: "long" }).format(
@@ -174,7 +229,7 @@ const TransactionDocument = ({ transaction, rentDetails }) => {
               <View style={styles.rentItem}>
                 <Text style={styles.boldText}>Total:</Text>
                 <Text>
-                  {rentDetails.totalAmount.toLocaleString("en-IN", {
+                  {totalAmount.toLocaleString("en-IN", {
                     style: "currency",
                     currency: "INR",
                     currencyDisplay: "symbol",
@@ -183,10 +238,10 @@ const TransactionDocument = ({ transaction, rentDetails }) => {
               </View>
               <View style={styles.rentItem}>
                 <Text style={styles.boldText}>
-                  Floor Discount: {rentDetails.floorDiscount || 0}%
+                  Floor Discount: {floorDiscount}%
                 </Text>
                 <Text>
-                  {rentDetails.floorDiscountAmount.toLocaleString("en-IN", {
+                  {floorDiscountAmount.toLocaleString("en-IN", {
                     style: "currency",
                     currency: "INR",
                     currencyDisplay: "symbol",
@@ -195,10 +250,10 @@ const TransactionDocument = ({ transaction, rentDetails }) => {
               </View>
               <View style={styles.rentItem}>
                 <Text style={styles.boldText}>
-                  Year Discount: {rentDetails.yearDiscount || 0}%
+                  Year Discount: {yearDisc}%
                 </Text>
                 <Text>
-                  {rentDetails.yearDiscountAmount.toLocaleString("en-IN", {
+                  {yearDiscountAmt.toLocaleString("en-IN", {
                     style: "currency",
                     currency: "INR",
                     currencyDisplay: "symbol",
@@ -208,7 +263,7 @@ const TransactionDocument = ({ transaction, rentDetails }) => {
               <View style={styles.rentItem}>
                 <Text style={styles.boldText}>Grand Total:</Text>
                 <Text>
-                  {rentDetails.grandTotal.toLocaleString("en-IN", {
+                  {grandTotal.toLocaleString("en-IN", {
                     style: "currency",
                     currency: "INR",
                     currencyDisplay: "symbol",

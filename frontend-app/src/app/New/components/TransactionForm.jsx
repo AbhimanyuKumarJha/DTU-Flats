@@ -299,6 +299,7 @@ export const TransactionCard = ({
               tillMonth={transaction.tillMonth}
               tillYear={transaction.tillYear}
               onClose={handleCloseRentDisplay}
+              isFloorDiscount={isFloorDiscount}
             />
           )}
         </div>

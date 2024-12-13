@@ -51,6 +51,7 @@ const TransactionPage = () => {
         // Fetch rent rates and discounts
         const rentRates = await api.getRentRates();
         const discountData = await api.getDiscount();
+        
 
         const transactionsWithDetails = data.map((tx) => ({
           ...tx,
@@ -203,6 +204,7 @@ const TransactionPage = () => {
     const rentRates = transaction.rentRates || [];
     const floorDiscount = transaction.floorDiscount || 0;
     const yearDiscount = transaction.yearDiscount || 0;
+    const floorNumber = transaction.floorNumber
 
     const months = transaction.monthsPaid;
     let total = 0;
@@ -226,6 +228,7 @@ const TransactionPage = () => {
       floorDiscount,
       yearDiscount,
       floorDiscountAmount,
+      floorNumber,
       yearDiscountAmount,
       grandTotal,
     };
@@ -233,8 +236,11 @@ const TransactionPage = () => {
 
   const handleDownload = async (transaction) => {
     try {
+      // Fetch user data using the userId from the transaction
+      const userData = await api.getUserById(transaction.userId._id);
+      console.log("handledownload userdata",userData);
       const rentDetails = calculateRentDetails(transaction);
-      const transactionWithRentDetails = { ...transaction, rentDetails };
+      const transactionWithRentDetails = { ...transaction, rentDetails, userData }; // Include user data
       await generateAndDownloadPDF(transactionWithRentDetails);
     } catch (error) {
       console.error("Error generating PDF:", error);

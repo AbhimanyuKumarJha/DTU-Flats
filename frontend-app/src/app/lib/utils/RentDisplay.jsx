@@ -142,6 +142,7 @@ const RentDisplay = ({
         <span>₹{totalAmount.toFixed(2)}</span>
       </div>
       <div className="flex justify-between text-black">
+        
         <span>Floor Discount: {floorDiscount ? floorDiscount : 0}%</span>
         <span>₹{floorDiscountAmount.toFixed(2)}</span>
       </div>

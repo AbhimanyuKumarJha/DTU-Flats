@@ -219,7 +219,7 @@ const TransactionCard = ({ transaction, onDownload }) => {
         className=" flex items-center bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors w-fit ml-auto mr-0"
       >
         <FaFileDownload className="mr-2" />
-        Download
+        Download Reciept
       </button>
 
       {showRentDisplay && (

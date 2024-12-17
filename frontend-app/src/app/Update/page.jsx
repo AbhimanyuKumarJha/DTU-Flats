@@ -65,6 +65,7 @@ export default function Update() {
 
   // Fetch all users when the component mounts
   const fetchUsers = async () => {
+    setLoading(true);
     try {
       const data = await api.getAllUsers();
       setUsers(data);
@@ -384,6 +385,11 @@ export default function Update() {
     return next;
   };
 
+  // Assuming you have the counts of residents available
+  const totalResidents = users.length;
+  const activeResidents = users.filter(user => user.isActive).length;
+  const inactiveResidents = totalResidents - activeResidents;
+
   if (loading) {
     return <div className="text-center mt-10">Loading...</div>;
   }
@@ -393,11 +399,11 @@ export default function Update() {
   }
   return (
     <>
-      <h1 className="text-4xl font-bold text-center mt-4 text-black">
-        Add New Payment
-      </h1>
+      
+      
       <div className="flex flex-col mt-4 items-center justify-center">
-        <div className="w-2/3">
+        <div className="w-2/3 mb-4">
+          <h2 className="text-lg font-semibold mt-5 mb-2">Search Resident</h2>
           <input
             type="text"
             placeholder="Enter name"
@@ -407,13 +413,27 @@ export default function Update() {
           />
           <p className="text-sm text-black">Enter at least 3 characters</p>
         </div>
+        <div className="flex justify-center mb-4">
+          <img src="/DTU,_Delhi_official_logo.png" alt="DTU Flats Logo" className="h-24 text-4xl" />
+        </div>
+        <h1 className="text-5xl font-bold text-center mt-5 text-black mb-2">
+          Welcome to DTU Flats
+        </h1>
+       
+        
+        <div className="bg-white mt-20 bg-opacity-30 backdrop-blur-md p-4 rounded-lg shadow-lg text-center mb-4">
+          <h2 className="text-3xl font-semibold">Resident Statistics</h2>
+          <p className="text-xl font-bold">Total Residents: {totalResidents}</p>
+          <p className="text-xl font-bold">Active Residents: {activeResidents}</p>
+          <p className="text-xl font-bold">Inactive Residents: {inactiveResidents}</p>
+        </div>
 
         {
           /* Display the table only if there are at least 3 characters in the input */
           filterName.length >= 3 && (
             <div className="w-4/5 bg-white rounded-md p-2">
               {!paymentmode ? (
-                <table className="min-w-full bg-white border text-black rounded-sm">
+                <table className="min-w-full bg-white border text-black rounded-sm mb-4">
                   <thead className="py-3">
                     <tr className="text-gray-700 font-bold border-b bg-gray-200 py-3 text-start text-lg uppercase">
                       <th className="text-start px-4 py-2">Status</th>
@@ -515,12 +535,12 @@ export default function Update() {
                     &larr; Back to Users
                   </button>
                   {isCurrentMonthPaid() ? (
-                    <div className="text-center text-green-500 font-semibold">
+                    <div className="text-center text-green-500 font-semibold mb-4">
                       Payment for the current month is already done.
                     </div>
                   ) : (
                     <>
-                      <div>
+                      <div className="mb-4">
                         <div className=" text-black font-semibold">
                           Name: {selectedUser.name}
                         </div>
@@ -556,16 +576,9 @@ export default function Update() {
                             }}
                             isOnly={transactions.length === 1}
                             mode="create"
+                            userId={selectedUser._id}
                           />
                         ))}
-                        {/*
-                        //not need to add more than one transaction as we are adding multiple months at once
-                        <button
-                          className="bg-green-500 text-white px-4 py-2 rounded-md mt-4"
-                          onClick={handleAddTransaction}
-                        >
-                          Add Another Transaction
-                        </button> */}
                         <button
                           className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 ml-2"
                           onClick={handleTransactionSubmit}

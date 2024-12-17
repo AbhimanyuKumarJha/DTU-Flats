@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
-import { FaMoneyBillWave, FaPlus, FaTrash } from "react-icons/fa";
+import { FaMoneyBillWave, FaPlus, FaTrash, FaCalendar } from "react-icons/fa";
 import {
   PAYMENT_MODES,
   TRANSACTION_STATUS,
 } from "../../lib/constants/formConstants";
 import { useRentCalculation } from "../../lib/hooks/useRentCalculation";
 import RentDisplay from "../../lib/utils/RentDisplay";
+import CustomMonthCalendar from './CustomMonthCalendar'; 
 
 const TransactionForm = ({
   userId,
@@ -138,6 +139,7 @@ const TransactionForm = ({
             onRemove={() => removeTransaction(index)}
             isOnly={transactions.length === 1}
             mode={mode}
+            userId={userId}
           />
         ))}
 
@@ -165,6 +167,7 @@ export const TransactionCard = ({
   isOnly,
   mode,
   isFloorDiscount,
+  userId,
 }) => {
   const { calculatedAmount, monthsPaid } = useRentCalculation(
     transaction.fromMonth,
@@ -175,6 +178,9 @@ export const TransactionCard = ({
     isFloorDiscount
   );
   const [showRentDisplay, setShowRentDisplay] = useState(false);
+  const [showFromMonthCalendar, setShowFromMonthCalendar] = useState(false);
+  const [showTillMonthCalendar, setShowTillMonthCalendar] = useState(false);
+
   const handleRentDisplay = (e) => {
     e.preventDefault();
     setShowRentDisplay(true);
@@ -234,55 +240,102 @@ export const TransactionCard = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Date Range Selection */}
-        <div className="flex flex-col">
+        <div className="flex flex-col relative">
           <label className="font-medium text-gray-700">From Month</label>
-          <input
-            type="month"
-            value={
-              transaction.fromYear && transaction.fromMonth
-                ? `${transaction.fromYear}-${String(
-                    transaction.fromMonth
-                  ).padStart(2, "0")}`
-                : ""
-            }
-            onChange={(e) => {
-              const [year, month] = e.target.value.split("-");
-              onUpdate({
-                ...transaction,
-                fromMonth: month,
-                fromYear: year,
-              });
-            }}
-            // disabled={mode === "edit" && index < existingTransactions.length}
-            className={`mt-1 p-2 border rounded-md ${
-              mode === "edit" && index < existingTransactions.length
-                ? "bg-gray-100"
-                : ""
-            }`}
-          />
+          <div className="flex items-center">
+            <input
+              type="month"
+              value={
+                transaction.fromYear && transaction.fromMonth
+                  ? `${transaction.fromYear}-${String(
+                      transaction.fromMonth
+                    ).padStart(2, "0")}`
+                  : ""
+              }
+              onChange={(e) => {
+                const [year, month] = e.target.value.split("-");
+                onUpdate({
+                  ...transaction,
+                  fromMonth: month,
+                  fromYear: year,
+                });
+              }}
+              className={`mt-1 p-2 border rounded-md flex-grow ${
+                mode === "edit" && index < existingTransactions.length
+                  ? "bg-gray-100"
+                  : ""
+              }`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowFromMonthCalendar(true)}
+              className="ml-2 mt-1 p-2 bg-gray-200 rounded-md"
+            >
+              <FaCalendar />
+            </button>
+          </div>
+          {showFromMonthCalendar && (
+            <CustomMonthCalendar
+              userId={userId}
+              selectedMonth={parseInt(transaction.fromMonth)}
+              selectedYear={parseInt(transaction.fromYear)}
+              onSelect={(month, year) => {
+                onUpdate({
+                  ...transaction,
+                  fromMonth: month.toString(),
+                  fromYear: year.toString(),
+                });
+              }}
+              onClose={() => setShowFromMonthCalendar(false)}
+            />
+          )}
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col relative">
           <label className="font-medium text-gray-700">Till Month</label>
-          <input
-            type="month"
-            value={
-              transaction.tillYear && transaction.tillMonth
-                ? `${transaction.tillYear}-${String(
-                    transaction.tillMonth
-                  ).padStart(2, "0")}`
-                : ""
-            }
-            onChange={(e) => {
-              const [year, month] = e.target.value.split("-");
-              onUpdate({
-                ...transaction,
-                tillMonth: month,
-                tillYear: year,
-              });
-            }}
-            className="mt-1 p-2 border rounded-md"
-          />
+          <div className="flex items-center">
+            <input
+              type="month"
+              value={
+                transaction.tillYear && transaction.tillMonth
+                  ? `${transaction.tillYear}-${String(
+                      transaction.tillMonth
+                    ).padStart(2, "0")}`
+                  : ""
+              }
+              onChange={(e) => {
+                const [year, month] = e.target.value.split("-");
+                onUpdate({
+                  ...transaction,
+                  tillMonth: month,
+                  tillYear: year,
+                });
+              }}
+              className="mt-1 p-2 border rounded-md flex-grow"
+            />
+            <button
+              type="button"
+              onClick={() => setShowTillMonthCalendar(true)}
+              className="ml-2 mt-1 p-2 bg-gray-200 rounded-md"
+            >
+              <FaCalendar />
+            </button>
+          </div>
+          {showTillMonthCalendar && (
+            <CustomMonthCalendar
+              userId={userId}
+              selectedMonth={parseInt(transaction.tillMonth)}
+              selectedYear={parseInt(transaction.tillYear)}
+              onSelect={(month, year) => {
+                onUpdate({
+                  ...transaction,
+                  tillMonth: month.toString(),
+                  tillYear: year.toString(),
+                });
+              }}
+              onClose={() => setShowTillMonthCalendar(false)}
+            />
+          )}
         </div>
 
         {/* Calculated Amount Display */}

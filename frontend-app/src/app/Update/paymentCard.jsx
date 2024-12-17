@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaCalendar } from "react-icons/fa";
 import { useRentCalculation } from "../lib/hooks/useRentCalculation";
 import {
   PAYMENT_MODES,
   TRANSACTION_STATUS,
 } from "../lib/constants/formConstants";
 import RentDisplay from "../lib/utils/RentDisplay";
+import CustomMonthCalendar from "../New/components/CustomMonthCalendar";
+
 const PaymentCard = ({
   transaction,
   index,
@@ -15,12 +17,16 @@ const PaymentCard = ({
   isOnly,
   mode,
   isFloorDiscount,
+  userId,
 }) => {
   const [fromMonth, setFromMonth] = useState(transaction.fromMonth);
   const [fromYear, setFromYear] = useState(transaction.fromYear);
   const [tillMonth, setTillMonth] = useState(transaction.tillMonth);
   const [tillYear, setTillYear] = useState(transaction.tillYear);
   const [showRentDisplay, setShowRentDisplay] = useState(false);
+  const [showFromMonthCalendar, setShowFromMonthCalendar] = useState(false);
+  const [showTillMonthCalendar, setShowTillMonthCalendar] = useState(false);
+
   const handleRentDisplay = () => {
     setShowRentDisplay(true);
   };
@@ -93,44 +99,88 @@ const PaymentCard = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Date Range Selection */}
-        <div className="flex flex-col">
+        <div className="flex flex-col relative">
           <label className="font-medium text-gray-700">From Month</label>
-          <input
-            type="month"
-            value={
-              fromYear && fromMonth
-                ? `${fromYear}-${String(fromMonth).padStart(2, "0")}`
-                : ""
-            }
-            onChange={(e) => {
-              const [year, month] = e.target.value.split("-");
-              setFromYear(year);
-              setFromMonth(month);
-            }}
-            className={`mt-1 p-2 border rounded-md ${
-              mode === "edit" && index < existingTransactions.length
-                ? "bg-gray-100"
-                : ""
-            }`}
-          />
+          <div className="flex items-center">
+            <input
+              type="month"
+              value={
+                fromYear && fromMonth
+                  ? `${fromYear}-${String(fromMonth).padStart(2, "0")}`
+                  : ""
+              }
+              onChange={(e) => {
+                const [year, month] = e.target.value.split("-");
+                setFromYear(year);
+                setFromMonth(month);
+              }}
+              className={`mt-1 p-2 border rounded-md ${
+                mode === "edit" && index < existingTransactions.length
+                  ? "bg-gray-100"
+                  : ""
+              }`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowFromMonthCalendar(true)}
+              className="ml-2 mt-1 p-2 bg-gray-200 rounded-md"
+            >
+              <FaCalendar />
+            </button>
+          </div>
+          {showFromMonthCalendar && (
+            <CustomMonthCalendar
+              userId={userId}
+              selectedMonth={parseInt(fromMonth)}
+              selectedYear={parseInt(fromYear)}
+              onSelect={(month, year) => {
+                setFromMonth(month.toString());
+                setFromYear(year.toString());
+                setShowFromMonthCalendar(false);
+              }}
+              onClose={() => setShowFromMonthCalendar(false)}
+            />
+          )}
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col relative">
           <label className="font-medium text-gray-700">Till Month</label>
-          <input
-            type="month"
-            value={
-              tillYear && tillMonth
-                ? `${tillYear}-${String(tillMonth).padStart(2, "0")}`
-                : ""
-            }
-            onChange={(e) => {
-              const [year, month] = e.target.value.split("-");
-              setTillYear(year);
-              setTillMonth(month);
-            }}
-            className="mt-1 p-2 border rounded-md"
-          />
+          <div className="flex items-center">
+            <input
+              type="month"
+              value={
+                tillYear && tillMonth
+                  ? `${tillYear}-${String(tillMonth).padStart(2, "0")}`
+                  : ""
+              }
+              onChange={(e) => {
+                const [year, month] = e.target.value.split("-");
+                setTillYear(year);
+                setTillMonth(month);
+              }}
+              className="mt-1 p-2 border rounded-md"
+            />
+            <button
+              type="button"
+              onClick={() => setShowTillMonthCalendar(true)}
+              className="ml-2 mt-1 p-2 bg-gray-200 rounded-md"
+            >
+              <FaCalendar />
+            </button>
+          </div>
+          {showTillMonthCalendar && (
+            <CustomMonthCalendar
+              userId={userId}
+              selectedMonth={parseInt(tillMonth)}
+              selectedYear={parseInt(tillYear)}
+              onSelect={(month, year) => {
+                setTillMonth(month.toString());
+                setTillYear(year.toString());
+                setShowTillMonthCalendar(false);
+              }}
+              onClose={() => setShowTillMonthCalendar(false)}
+            />
+          )}
         </div>
 
         {/* Calculated Amount Display */}

@@ -13,14 +13,17 @@ import {
   FaPhoneAlt,
   FaRupeeSign,
 } from "react-icons/fa";
-
+import { useRouter } from "next/router";
+  
 const UserDetailsSection = ({
   formData,
   setFormData,
   onSubmit,
   errors,
   setErrors,
+  mode
 }) => {
+  
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prevUser) => ({
@@ -58,7 +61,8 @@ const UserDetailsSection = ({
     };
     onSubmit(completeFormData);
   };
-
+  // const router = useRouter(); // Move inside the component
+  // const route_name = router.pathname.includes("edit") ? "edit" : "create"; // Determine mode based on route
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Form fields */}
@@ -71,7 +75,7 @@ const UserDetailsSection = ({
           />
         </div>
         <h2 className="text-4xl font-bold text-center text-gray-800">
-          Add Record
+            {mode === "edit" ? "Edit Details" : "Add Details"}
         </h2>
 
         {/* Name Field */}
@@ -301,7 +305,7 @@ const UserDetailsSection = ({
           type="submit"
           className="col-span-2 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
         >
-          Next
+            Submit
         </button>
       </div>
     </form>

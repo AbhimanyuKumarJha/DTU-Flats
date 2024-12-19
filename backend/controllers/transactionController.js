@@ -89,39 +89,39 @@ exports.updateTransaction = async (req, res) => {
   }
 };
 // Update a transaction by ID for a specific user
-// exports.updateTransactionByUserId = async (req, res) => {
-//   try {
-//     const { userId, transactionId } = req.params;
+exports.updateTransactionByUserId = async (req, res) => {
+  try {
+    const { userId, transactionId } = req.params;
     
-//     // Find the transaction and verify ownership
-//     const transaction = await Transaction.findById(transactionId);
-//     if (!transaction || transaction.userId.toString() !== userId) {
-//       return res.status(404).json({ 
-//         error: "Transaction not found or does not belong to the user" 
-//       });
-//     }
+    // Find the transaction and verify ownership
+    const transaction = await Transaction.findById(transactionId);
+    if (!transaction || transaction.userId.toString() !== userId) {
+      return res.status(404).json({ 
+        error: "Transaction not found or does not belong to the user" 
+      });
+    }
 
-//     // Update only the allowed fields
-//     const allowedUpdates = {
-//       status: req.body.status,
-//       paymentDetails: req.body.paymentDetails
-//     };
+    // Update only the allowed fields
+    const allowedUpdates = {
+      status: req.body.status,
+      paymentDetails: req.body.paymentDetails
+    };
 
-//     // Update the transaction
-//     const updatedTransaction = await Transaction.findByIdAndUpdate(
-//       transactionId,
-//       allowedUpdates,
-//       { 
-//         new: true,
-//         runValidators: true 
-//       }
-//     ).populate("userId");
+    // Update the transaction
+    const updatedTransaction = await Transaction.findByIdAndUpdate(
+      transactionId,
+      allowedUpdates,
+      { 
+        new: true,
+        runValidators: true 
+      }
+    ).populate("userId");
 
-//     res.status(200).json(updatedTransaction);
-//   } catch (error) {
-//     res.status(400).json({ error: error.message });
-//   }
-// };
+    res.status(200).json(updatedTransaction);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
 
 // Delete a transaction by ID
 exports.deleteTransaction = async (req, res) => {

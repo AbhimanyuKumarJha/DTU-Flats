@@ -86,19 +86,19 @@ const api = {
     }
   },
 
-  updateTransactionByUserId : async (userId, transactionId, transactionData) => {
-    try {
-      const response = await axios.put(
-        `${BASE_URL}/transactions/user/${userId}/transactions/${transactionId}`,
-        transactionData // Don't need to include transactionId in body since it's in URL
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(
-        error.response?.data?.error || "Error updating transaction"
-      );
-    }
-  },
+  // updateTransactionByUserId : async (userId, transactionId, transactionData) => {
+  //   try {
+  //     const response = await axios.put(
+  //       `${BASE_URL}/transactions/user/${userId}/transactions/${transactionId}`,
+  //       transactionData // Don't need to include transactionId in body since it's in URL
+  //     );
+  //     return response.data;
+  //   } catch (error) {
+  //     throw new Error(
+  //       error.response?.data?.error || "Error updating transaction"
+  //     );
+  //   }
+  // },
 
   // Get all transactions
   getAllTransactions: async () => {

@@ -9,6 +9,7 @@ import {
   AiOutlineArrowDown,
 } from "react-icons/ai";
 import PopUP from "../utils/popup";
+import TransactionDetails from "./TransactionDetails";
 
 const List = () => {
   const [data, setData] = useState([]);
@@ -20,6 +21,8 @@ const List = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [sortOrder, setSortOrder] = useState("asc");
   const [editUserId, setEditUserId] = useState(null);
+  const [activeTab, setActiveTab] = useState("personal");
+
   const [editUser, setEditUser] = useState({
     name: "",
     dateOfBirth: "",
@@ -40,6 +43,7 @@ const List = () => {
     try {
       const response = await axios.get("/api/list", { params: filters });
       setData(response.data);
+      // console.log( " user data in edit list ", data)
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -222,7 +226,7 @@ const List = () => {
           </div>
 
           {/* Responsive Table */}
-          <div className="overflow-auto rounded-lg shadow-lg max-h-[550px]">
+          <div className="overflow-auto rounded-lg shadow-lg max-h-[56vh]">
             <table className="min-w-full bg-white">
               <thead>
                 <tr className="text-left text-gray-700 font-semibold uppercase bg-gray-200">
@@ -282,37 +286,73 @@ const List = () => {
           </div>
 
           {/* Resident Statistics */}
-          <div className="text-center mt-4">
+          {/* <div className="text-center mt-4">
             <p>Total Residents: {totalResidents}</p>
             <p>Active Residents: {activeResidents}</p>
             <p>Inactive Residents: {inactiveResidents}</p>
-          </div>
+          </div> */}
 
           {/* Edit Modal */}
-          {editUserId && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="w-full">
-                <div className="relative">
-                  <Form
-                    data={editUser}
-                    mode="edit"
-                    updatelist={getList}
-                    closeModal={closeModal}
-                    triggerPopup={triggerPopup}
-                  />
-                  <button
-                    onClick={closeModal}
-                    className="absolute top-12 right-12 text-gray-600 hover:text-gray-800"
-                  >
-                    <AiOutlineClose size={24} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Edit Modal */}
+{/* Edit Modal */}
+{/* Edit Modal */}
+{/* Edit Modal */}
+{editUserId && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-gray-500 w-full md:w-2/3 lg:w-1/2 rounded-lg shadow-lg relative">
+      {/* Tabs */}
+      <div className="flex">
+        <button
+          onClick={() => setActiveTab("personal")}
+          className={`flex-1 py-2 text-center text-base font-bold border-4  ${
+            activeTab === "personal"
+              ? "text-blue-600 border-blue-500 bg-white"
+              : "text-gray-500 bg-gray-100 border-transparent"
+          }`}
+        >
+          Personal Details
+        </button>
+        <button
+          onClick={() => setActiveTab("transaction")}
+          className={`flex-1 py-2 text-center text-base font-bold border-4 ${
+            activeTab === "transaction"
+              ? "text-blue-600 border-blue-500 bg-white"
+              : "text-gray-500 bg-gray-100 border-transparent"
+          }`}
+        >
+          Transaction Details
+        </button>
+      </div>
 
-          {/* Success Popup */}
-          {showPopup && <PopUP />}
+      {/* Tab Content */}
+      <div className="p-6">
+        {activeTab === "personal" ? (
+          <Form
+            data={editUser}
+            mode="edit"
+            updatelist={getList}
+            closeModal={closeModal}
+            triggerPopup={triggerPopup}
+          />
+        ) : (
+          <TransactionDetails userId={editUser.id} />
+        )}
+      </div>
+
+      {/* Close Button */}
+      <button
+        onClick={closeModal}
+        className="absolute top-14 right-4 bg-red-500 p-2 text-sm rounded-full text-white  hover:text-gray-800"
+      >
+        <AiOutlineClose size={24} />
+      </button>
+    </div>
+  </div>
+)}
+
+
+
+
         </>
       )}
     </div>

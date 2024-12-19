@@ -21,6 +21,8 @@ router.get(
 );
 // Add this route
 router.get("/user/:userId", transactionController.getTransactionsByUserId);
+//update
+router.put("/user/:userId/transactions/:transactionId", transactionController.updateTransactionByUserId);
 
 // Route to get a transaction by ID
 router.get("/:id", transactionController.getTransactionById);

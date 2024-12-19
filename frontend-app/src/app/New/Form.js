@@ -6,7 +6,7 @@ import { userSchema } from "../lib/validations/formSchemas.js";
 
 const Form = ({
   data,
-  mode = "create",
+  mode ,
   updatelist = () => {},
   closeModal = () => {},
   triggerPopup = () => {},
@@ -136,7 +136,7 @@ const Form = ({
         <div
           className="fixed top-0 left-0 w-full h-full bg-green-500 bg-opacity-95 flex items-center justify-center text-white text-2xl font-bold z-50 animate-fadeIn"
         >
-          User Details Added Successfully!
+           {mode === "edit" ? "User Details Updated Successfully" : "User Details Added Successfully"}
         </div>
       )}
 

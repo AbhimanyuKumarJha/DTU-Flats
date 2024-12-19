@@ -60,6 +60,9 @@ const TransactionPage = () => {
           yearDiscount: discountData[0]?.onYear || 0,
         }));
 
+        // Sort transactions by transactionDate in descending order
+        transactionsWithDetails.sort((a, b) => new Date(b.transactionDate) - new Date(a.transactionDate));
+
         setTransactions(transactionsWithDetails);
         setFilteredTransactions(transactionsWithDetails);
       } catch (err) {
@@ -323,9 +326,9 @@ const TransactionPage = () => {
 
       {/* Transactions Table */}
       {filteredTransactions.length === 0 ? (
-        <div className="text-center text-black">No transactions found.</div>
+        <div className="text-center text-black ">No transactions found.</div>
       ) : (
-        <div className="overflow-x-auto rounded-md">
+        <div className="overflow-x-auto rounded-md overflow-auto max-h-[60vh]">
           <table className="min-w-full bg-white border text-black rounded-sm">
             <thead className="py-3">
               <tr className="text-gray-700 font-bold border-b bg-gray-200 py-3 text-start text-lg uppercase">

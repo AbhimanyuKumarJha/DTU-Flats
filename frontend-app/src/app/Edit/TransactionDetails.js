@@ -2,9 +2,11 @@ import React from "react";
 import { useState, useEffect } from "react";
 import api from "../lib/services/api";
 import { FaFileDownload, FaEdit, FaSave, FaTimes } from "react-icons/fa";
+import RentDisplay from "../lib/utils/RentDisplay";
+import { generateAndDownloadPDF } from "../lib/utils/pdfGenerator";
 
 const StatusIndicator = ({ status, isEditing, onStatusChange }) => {
-  const statuses = ['Pending', 'Completed', 'Failed'];
+  const statuses = ["Pending", "Completed", "Failed"];
   let color = "gray";
   if (status === "Completed") color = "green";
   else if (status === "Pending") color = "yellow";
@@ -12,13 +14,15 @@ const StatusIndicator = ({ status, isEditing, onStatusChange }) => {
 
   if (isEditing) {
     return (
-      <select 
+      <select
         value={status}
         onChange={(e) => onStatusChange(e.target.value)}
-        className="p-1 rounded border border-gray-300"
+        className="p-1 rounded border border-black text-black"
       >
-        {statuses.map(s => (
-          <option key={s} value={s}>{s}</option>
+        {statuses.map((s) => (
+          <option key={s} value={s}>
+            {s}
+          </option>
         ))}
       </select>
     );
@@ -34,7 +38,14 @@ const StatusIndicator = ({ status, isEditing, onStatusChange }) => {
   );
 };
 
-// const RentDisplay = ({ fromMonth, fromYear, tillMonth, tillYear, onClose, isFloorDiscount }) => {
+// const RentDisplay = ({
+//   fromMonth,
+//   fromYear,
+//   tillMonth,
+//   tillYear,
+//   onClose,
+//   isFloorDiscount,
+// }) => {
 //   return (
 //     <div className="bg-gray-100 p-4 rounded-lg">
 //       <div className="flex justify-between items-center mb-4">
@@ -61,8 +72,25 @@ const StatusIndicator = ({ status, isEditing, onStatusChange }) => {
 //     </div>
 //   );
 // };
-
-const TransactionCard = ({ transaction, userId, onDownload, onUpdateSuccess }) => {
+const handleDownload = async (transaction) => {
+  try {
+    // Fetch user data using the userId from the transaction
+    const userData = await api.getUserById(useri);
+    console.log("handledownload userdata",userData);
+    const rentDetails = calculateRentDetails(transaction);
+    const transactionWithRentDetails = { ...transaction, rentDetails, userData }; // Include user data
+    await generateAndDownloadPDF(transactionWithRentDetails);
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    alert("Failed to generate PDF. Please try again.");
+  }
+};
+const TransactionCard = ({
+  transaction,
+  userId,
+  onDownload,
+  onUpdateSuccess,
+}) => {
   const {
     monthsPaid,
     calculatedAmount,
@@ -71,7 +99,7 @@ const TransactionCard = ({ transaction, userId, onDownload, onUpdateSuccess }) =
     transactionDate,
     paymentDetails,
     _id,
-    isFloorDiscount
+    isFloorDiscount,
   } = transaction;
 
   const [showRentDisplay, setShowRentDisplay] = useState(false);
@@ -99,20 +127,20 @@ const TransactionCard = ({ transaction, userId, onDownload, onUpdateSuccess }) =
   };
 
   const handleStatusChange = (newStatus) => {
-    setEditedTransaction(prev => ({
+    setEditedTransaction((prev) => ({
       ...prev,
-      status: newStatus
+      status: newStatus,
     }));
   };
 
   const handlePaymentDetailsChange = (e) => {
     const { name, value } = e.target;
-    setEditedTransaction(prev => ({
+    setEditedTransaction((prev) => ({
       ...prev,
       paymentDetails: {
         ...prev.paymentDetails,
-        [name]: value
-      }
+        [name]: value,
+      },
     }));
   };
 
@@ -121,41 +149,46 @@ const TransactionCard = ({ transaction, userId, onDownload, onUpdateSuccess }) =
       // Prepare the update payload
       const updatedTransaction = {
         status: editedTransaction.status,
-        paymentDetails: {}
+        paymentDetails: {},
       };
-  
+
       // Add payment details based on payment mode
       if (paymentMode === "UPI") {
-        updatedTransaction.paymentDetails.upiTransactionId = 
+        updatedTransaction.paymentDetails.upiTransactionId =
           editedTransaction.paymentDetails.upiTransactionId;
       } else if (paymentMode === "DD" || paymentMode === "Cheque") {
-        updatedTransaction.paymentDetails.chequeOrDDNumber = 
+        updatedTransaction.paymentDetails.chequeOrDDNumber =
           editedTransaction.paymentDetails.chequeOrDDNumber;
       }
-  
+
       // Validation
-      if (paymentMode === "UPI" && !updatedTransaction.paymentDetails.upiTransactionId) {
+      if (
+        paymentMode === "UPI" &&
+        !updatedTransaction.paymentDetails.upiTransactionId
+      ) {
         throw new Error("UPI Transaction ID is required for UPI payments");
       }
-  
-      if ((paymentMode === "Cheque" || paymentMode === "DD") && 
-          !updatedTransaction.paymentDetails.chequeOrDDNumber) {
+
+      if (
+        (paymentMode === "Cheque" || paymentMode === "DD") &&
+        !updatedTransaction.paymentDetails.chequeOrDDNumber
+      ) {
         throw new Error(`${paymentMode} number is required`);
       }
-  
+
       // Call the API with the correct parameters
       await api.updateTransactionByUserId(userId, _id, updatedTransaction);
-      
+
       setIsEditing(false);
       setError(null);
-      
+
       // Refresh the transactions list
       if (onUpdateSuccess) {
         onUpdateSuccess();
       }
     } catch (err) {
       console.error("Error updating transaction:", err);
-      setError(err.message || 'Failed to update transaction');
+      setError(err.message || "Failed to update transaction");
     }
   };
 
@@ -215,8 +248,8 @@ const TransactionCard = ({ transaction, userId, onDownload, onUpdateSuccess }) =
 
       {/* Payment Status */}
       <div className="flex items-center gap-3">
-        <span className="text-gray-700 font-medium">Payment Status:</span>
-        <StatusIndicator 
+        <span className="text-black font-x">Payment Status:</span>
+        <StatusIndicator
           status={isEditing ? editedTransaction.status : status}
           isEditing={isEditing}
           onStatusChange={handleStatusChange}
@@ -231,38 +264,42 @@ const TransactionCard = ({ transaction, userId, onDownload, onUpdateSuccess }) =
 
       {/* Conditional Payment Details */}
       {paymentMode !== "Cash" && (
-        <div className="flex items-center gap-3 col-span-2">
-          <span className="text-gray-700 font-medium">
-            {paymentMode === "Cheque" || paymentMode === "DD"
-              ? `${paymentMode} Number:`
-              : "UPI ID:"}
-          </span>
-          {isEditing ? (
-            <input
-              type="text"
-              name={paymentMode === "UPI" ? "upiTransactionId" : "chequeOrDDNumber"}
-              value={
-                paymentMode === "UPI"
-                  ? editedTransaction.paymentDetails.upiTransactionId || ""
-                  : editedTransaction.paymentDetails.chequeOrDDNumber || ""
-              }
-              onChange={handlePaymentDetailsChange}
-              className="border border-gray-300 rounded px-2 py-1"
-            />
-          ) : (
-            <span className="text-gray-900">
-              {paymentMode === "UPI"
-                ? paymentDetails.upiTransactionId || "N/A"
-                : paymentDetails.chequeOrDDNumber || "N/A"}
-            </span>
-          )}
-        </div>
-      )}
+  <div className="flex items-center gap-3 col-span-2">
+  <span className="text-black font-medium">
+    {paymentMode === "Cheque" || paymentMode === "DD"
+      ? `${paymentMode} Number:`
+      : "UPI ID:"}
+  </span>
+  {isEditing ? (
+    <input
+      type="text"
+      name={paymentMode === "UPI" ? "upiTransactionId" : "chequeOrDDNumber"}
+      value={
+        paymentMode === "UPI"
+          ? editedTransaction.paymentDetails.upiTransactionId || ""
+          : editedTransaction.paymentDetails.chequeOrDDNumber || ""
+      }
+      onChange={handlePaymentDetailsChange}
+      className="border border-gray-500 focus:border-black focus:ring focus:ring-blue-300 font-medium text-black rounded px-2 py-1 bg-white shadow-sm placeholder-black"
+      placeholder={
+        paymentMode === "UPI"
+          ? "Enter UPI Transaction ID"
+          : "Enter Cheque/DD Number"
+      }
+    />
+  ) : (
+    <span className="text-black">
+      {paymentMode === "UPI"
+        ? paymentDetails.upiTransactionId || "N/A"
+        : paymentDetails.chequeOrDDNumber || "N/A"}
+    </span>
+  )}
+</div>
+)}
+
 
       {/* Error message */}
-      {error && (
-        <div className="col-span-2 text-red-500 text-sm">{error}</div>
-      )}
+      {error && <div className="col-span-2 text-red-500 text-sm">{error}</div>}
 
       {/* Action Buttons */}
       <div className="col-span-2 flex justify-end gap-4">
@@ -292,7 +329,7 @@ const TransactionCard = ({ transaction, userId, onDownload, onUpdateSuccess }) =
 
         {/* Download Button */}
         <button
-          onClick={() => onDownload(transaction)}
+          onClick={handleDownload}
           className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
         >
           <FaFileDownload className="w-4 h-4" />
@@ -325,17 +362,21 @@ const getMonthName = (monthNumber) => {
 const TransactionDetails = ({ userId }) => {
   const [transactions, setTransactions] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchUserData = async () => {
+    setLoading(true);
     try {
       const userTransactions = await api.getTransactionsByUserId(userId);
       setTransactions(userTransactions);
     } catch (err) {
       console.error("Error fetching user data:", err);
       setError("Failed to load user data.");
+    } finally {
+      setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     if (userId) {
       fetchUserData();
@@ -345,24 +386,30 @@ const TransactionDetails = ({ userId }) => {
   return (
     <>
       <h1 className="mx-auto text-center text-2xl font-bold text-blue-100">
-        Transactions
+        {loading ? "Loading..." : transactions.length > 0 ? "Transactions" : "No Transactions Available"}
       </h1>
-      <div className="grid grid-cols-1 gap-6 overflow-auto max-h-[80vh]">
-        {error && <div className="text-red-500">{error}</div>}
-        {transactions.length > 0 ? (
-          transactions.map((transaction) => (
-            <TransactionCard
-              key={transaction._id}
-              transaction={transaction}
-              userId={userId}
-              onUpdateSuccess={fetchUserData}
-              onDownload={(t) => {/* Implement download handler */}}
-            />
-          ))
-        ) : (
-          <p>No transactions available.</p>
-        )}
-      </div>
+      {loading ? (
+        <div className="flex justify-center items-center">
+          <div className="loader"></div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 overflow-auto max-h-[80vh]">
+          {error && <div className="text-red-500">{error}</div>}
+          {transactions.length > 0 ? (
+            transactions.map((transaction) => (
+              <TransactionCard
+                key={transaction._id}
+                transaction={transaction}
+                userId={userId}
+                onUpdateSuccess={fetchUserData}
+                onDownload={handleDownload}
+              />
+            ))
+          ) : (
+            <p></p>
+          )}
+        </div>
+      )}
     </>
   );
 };

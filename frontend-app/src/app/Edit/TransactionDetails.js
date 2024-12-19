@@ -72,19 +72,19 @@ const StatusIndicator = ({ status, isEditing, onStatusChange }) => {
 //     </div>
 //   );
 // };
-const handleDownload = async (transaction) => {
-  try {
-    // Fetch user data using the userId from the transaction
-    const userData = await api.getUserById(useri);
-    console.log("handledownload userdata",userData);
-    const rentDetails = calculateRentDetails(transaction);
-    const transactionWithRentDetails = { ...transaction, rentDetails, userData }; // Include user data
-    await generateAndDownloadPDF(transactionWithRentDetails);
-  } catch (error) {
-    console.error("Error generating PDF:", error);
-    alert("Failed to generate PDF. Please try again.");
-  }
-};
+// const handleDownload = async (transaction) => {
+//   try {
+//     // Fetch user data using the userId from the transaction
+//     const userData = await api.getUserById(transaction.userId._id);
+//     console.log("handledownload userdata",userData);
+//     const rentDetails = calculateRentDetails(transaction);
+//     const transactionWithRentDetails = { ...transaction, rentDetails, userData }; // Include user data
+//     await generateAndDownloadPDF(transactionWithRentDetails);
+//   } catch (error) {
+//     console.error("Error generating PDF:", error);
+//     alert("Failed to generate PDF. Please try again.");
+//   }
+// };
 const TransactionCard = ({
   transaction,
   userId,
@@ -328,13 +328,13 @@ const TransactionCard = ({
         )}
 
         {/* Download Button */}
-        <button
+        {/* <button
           onClick={handleDownload}
           className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
         >
           <FaFileDownload className="w-4 h-4" />
           Download Receipt
-        </button>
+        </button> */}
       </div>
 
       {showRentDisplay && (
@@ -402,7 +402,7 @@ const TransactionDetails = ({ userId }) => {
                 transaction={transaction}
                 userId={userId}
                 onUpdateSuccess={fetchUserData}
-                onDownload={handleDownload}
+                
               />
             ))
           ) : (

@@ -7,9 +7,11 @@ import {
   AiFillEdit,
   AiOutlineArrowUp,
   AiOutlineArrowDown,
+  AiFillDelete,
 } from "react-icons/ai";
 import PopUP from "../utils/popup";
 import TransactionDetails from "./TransactionDetails";
+import api from "../lib/services/api";
 
 const List = () => {
   const [data, setData] = useState([]);
@@ -22,6 +24,10 @@ const List = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [editUserId, setEditUserId] = useState(null);
   const [activeTab, setActiveTab] = useState("personal");
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+
 
   const [editUser, setEditUser] = useState({
     name: "",
@@ -119,6 +125,11 @@ const List = () => {
     setMobileFilter(e.target.value);
   };
 
+  const handleDeleteClick = (userId) => {
+    setUserToDelete(userId);
+    setShowDeleteConfirmation(true);
+  };
+
   const handleSortByName = () => {
     setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
   };
@@ -164,6 +175,21 @@ const List = () => {
   const totalResidents = filteredData.length;
   const activeResidents = filteredData.filter(user => user.isActive).length;
   const inactiveResidents = filteredData.filter(user => !user.isActive).length;
+
+  const deleteUser = async (userId) => {
+    try {
+      const response = await api.deleteUser(userId);
+      // Optionally, you can trigger a refresh of the list after deletion
+      await getList(); // Refresh the list after deletion
+      setShowDeleteConfirmation(false);
+      setShowDeleteSuccess(true);
+      setTimeout(() => setShowDeleteSuccess(false), 3000);
+      triggerPopup(); // Show a success message
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      // Optionally, handle error (e.g., show an error message)
+    }
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -263,13 +289,20 @@ const List = () => {
                         {new Date(item.dateOfBirth).toLocaleDateString("en-GB")}
                       </td>
                       <td className="p-3 text-black">{item.mobileNumber}</td>
-                      <td className="p-3">
+                      <td className="p-3 flex space-x-8">
                         <button
                           onClick={() => handleEditClick(item)}
                           className="text-blue-500 hover:text-blue-700 flex items-center space-x-1"
                         >
-                          <AiFillEdit />
-                          <span>Edit</span>
+                          <AiFillEdit  size={20}/>
+                          
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(item._id)}
+                          className="text-red-500 hover:text-red-700 "
+                        >
+                          <AiFillDelete size={20} />
+                          
                         </button>
                       </td>
                     </tr>
@@ -284,19 +317,38 @@ const List = () => {
               </tbody>
             </table>
           </div>
+          {showDeleteConfirmation && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg shadow-lg">
+                <h2 className="text-xl text-black font-bold mb-4">Confirm Deletion</h2>
+                <p className="mb-4 text-black">Are you sure you want to delete this user?</p>
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setShowDeleteConfirmation(false)}
+                    className="px-4 py-2 bg-blue-400 rounded hover:bg-blue-500"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => deleteUser(userToDelete)}
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
-          {/* Resident Statistics */}
-          {/* <div className="text-center mt-4">
-            <p>Total Residents: {totalResidents}</p>
-            <p>Active Residents: {activeResidents}</p>
-            <p>Inactive Residents: {inactiveResidents}</p>
-          </div> */}
+          {/* Delete Success Popup */}
+          {showDeleteSuccess && (
+            <div className="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded shadow-lg z-50">
+              User deleted successfully!
+            </div>
+          )}
 
-          {/* Edit Modal */}
-          {/* Edit Modal */}
-{/* Edit Modal */}
-{/* Edit Modal */}
-{/* Edit Modal */}
+      
+
 {editUserId && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div className="bg-gray-500 w-full md:w-2/3 lg:w-1/2 rounded-lg shadow-lg relative">

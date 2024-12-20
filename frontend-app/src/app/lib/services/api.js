@@ -231,6 +231,15 @@ const api = {
       );
     }
   },
+  // Delete User API
+  deleteUser: async (userId) => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/users/${userId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || "Error deleting user");
+    }
+  },
 };
 
 export default api;

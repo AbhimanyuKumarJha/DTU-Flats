@@ -231,6 +231,15 @@ const api = {
       );
     }
   },
+  //delete transaction
+  deleteTransaction: async (transactionId) => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/transactions/${transactionId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.error || "Error deleting transaction");
+    }
+  },
   // Delete User API
   deleteUser: async (userId) => {
     try {

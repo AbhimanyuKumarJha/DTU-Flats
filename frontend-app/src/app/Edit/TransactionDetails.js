@@ -4,6 +4,7 @@ import api from "../lib/services/api";
 import { FaFileDownload, FaEdit, FaSave, FaTimes } from "react-icons/fa";
 import RentDisplay from "../lib/utils/RentDisplay";
 import { generateAndDownloadPDF } from "../lib/utils/pdfGenerator";
+import { FaTrash } from "react-icons/fa";
 
 const StatusIndicator = ({ status, isEditing, onStatusChange }) => {
   const statuses = ["Pending", "Completed", "Failed"];
@@ -106,11 +107,28 @@ const TransactionCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedTransaction, setEditedTransaction] = useState(transaction);
   const [error, setError] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
 
   const handleRentDisplay = () => {
     setShowRentDisplay(true);
   };
-
+  const handleDelete = async () => {
+    try {
+      await api.deleteTransaction(_id);
+      setShowDeleteConfirm(false);
+      setShowDeleteSuccess(true);
+      setTimeout(() => {
+        setShowDeleteSuccess(false);
+        if (onUpdateSuccess) {
+          onUpdateSuccess();
+        }
+      }, 2000);
+    } catch (err) {
+      console.error("Error deleting transaction:", err);
+      setError(err.message || "Failed to delete transaction");
+    }
+  };
   const handleCloseRentDisplay = () => {
     setShowRentDisplay(false);
   };
@@ -210,6 +228,13 @@ const TransactionCard = ({
   return (
     <div className="bg-white shadow-lg hover:shadow-xl border border-gray-100 hover:border-gray-200 transition-all duration-300 rounded-xl p-8 grid grid-cols-2 gap-6 items-start md:w-4/5 lg:w-4/5 mx-auto">
       {/* Transaction Period */}
+      {/* <button 
+        onClick={() => setShowDeleteConfirm(true)}
+        className="absolute top-4 right-4 text-red-500 hover:text-red-700 transition-colors"
+        title="Delete transaction"
+      >
+        <FaTrash className="w-4 h-4" />
+      </button> */}
       <div className="flex items-center gap-3">
         <span className="text-gray-700 font-medium min-w-20">From:</span>
         <span className="text-gray-900">
@@ -294,6 +319,9 @@ const TransactionCard = ({
         : paymentDetails.chequeOrDDNumber || "N/A"}
     </span>
   )}
+  {/* Delete Confirmation Modal */}
+  
+      
 </div>
 )}
 
@@ -319,14 +347,53 @@ const TransactionCard = ({
             </button>
           </>
         ) : (
-          <button
-            onClick={handleEdit}
-            className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-          >
-            <FaEdit className="w-4 h-4" /> Edit
-          </button>
+          <>
+            <button
+              onClick={handleEdit}
+              className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+            >
+              <FaEdit className="w-4 h-4" /> Edit
+            </button>
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+            >
+              <FaTrash className="w-4 h-4" /> Delete
+            </button>
+          </>
+          
         )}
+        {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl">
+            <h3 className="text-lg font-semibold mb-4 text-black ">Confirm Delete</h3>
+            <p className="text-black">Are you sure you want to delete this transaction?</p>
+            <div className="flex justify-end gap-4 mt-6">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
+      {/* Delete Success Modal */}
+      {showDeleteSuccess && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl">
+            <p className="text-green-600 font-semibold">Transaction deleted successfully!</p>
+          </div>
+        </div>
+      )}
         {/* Download Button */}
         {/* <button
           onClick={handleDownload}

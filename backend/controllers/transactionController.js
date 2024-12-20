@@ -195,3 +195,28 @@ exports.getTransactionsByUserId = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Delete a transaction by ID for a specific user
+exports.deleteTransactionByUserId = async (req, res) => {
+  try {
+    const { userId, transactionId } = req.params;
+
+    // Find the transaction and verify ownership
+    const transaction = await Transaction.findById(transactionId);
+    if (!transaction || transaction.userId.toString() !== userId) {
+      return res.status(404).json({ 
+        error: "Transaction not found or does not belong to the user" 
+      });
+    }
+
+    // Remove transaction reference from user
+    await User.findByIdAndUpdate(userId, {
+      $pull: { transactions: transaction._id },
+    });
+
+    await Transaction.findByIdAndDelete(transactionId);
+    res.status(200).json({ message: "Transaction deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

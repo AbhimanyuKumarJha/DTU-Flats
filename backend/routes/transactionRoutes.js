@@ -30,6 +30,9 @@ router.get("/:id", transactionController.getTransactionById);
 // Route to update a transaction by ID
 router.put("/:id", transactionController.updateTransaction);
 
+// router.delete("/user/:userId/transactions/:transactionId", transactionController.deleteTransactionByUserId);
+
+
 // Route to delete a transaction by ID
 router.delete("/:id", transactionController.deleteTransaction);
 

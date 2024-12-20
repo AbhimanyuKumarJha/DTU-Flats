@@ -12,6 +12,7 @@ import {
   FaBars,
   FaTimes,
   FaEye,
+  FaFileAlt,
 } from "react-icons/fa";
 
 const Navbar = () => {
@@ -74,6 +75,14 @@ const Navbar = () => {
             >
               <FaExchangeAlt className="transition-transform duration-300 hover:scale-105 hover:-translate-y-0.5" />
               <span className="font-bold">Transaction</span>
+            </Link>
+
+            <Link
+              href="/MonthlyReport"
+              className="flex items-center space-x-2 text-gray-800 border-b-2 border-transparent hover:border-blue-800"
+            >
+              <FaFileAlt className="transition-transform duration-300 hover:scale-105 hover:-translate-y-0.5" />
+              <span className="font-bold">Monthly Report</span>
             </Link>
           </div>
 

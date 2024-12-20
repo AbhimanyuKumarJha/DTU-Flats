@@ -134,6 +134,7 @@ const ViewPage = () => {
     setSortConfig({ key, direction });
   };
 
+  // Define getSortIndicator function
   const getSortIndicator = (key) => {
     if (sortConfig.key === key) {
       return sortConfig.direction === "asc" ? "▲" : "▼";
@@ -210,76 +211,76 @@ const ViewPage = () => {
       </div>
 
       {/* Users Table */}
-    
 
-{/* Users Table */}
-<div className="overflow-x-auto rounded-lg">
-  <div className="max-h-[67vh] overflow-y-auto"> {/* Added a wrapper for vertical scrolling */}
-    <table className="min-w-full bg-white border text-black rounded-sm">
-      <thead className="py-3">
-        <tr className="text-gray-700 font-bold border-b bg-gray-200 py-3 text-start text-lg uppercase">
-          <th className="text-start px-4 py-2">Status</th>
-          <th
-            className="text-start px-4 py-2 cursor-pointer relative"
-            onClick={() => requestSort("Name")}
-          >
-            Name {getSortIndicator("Name")}
-          </th>
-          <th
-            className="text-start px-4 py-2 cursor-pointer relative"
-            onClick={() => requestSort("Contact")}
-          >
-            Contact {getSortIndicator("Contact")}
-          </th>
-          <th
-            className="text-start px-4 py-2 cursor-pointer relative"
-            onClick={() => requestSort("Date of Birth")}
-          >
-            Date of Birth {getSortIndicator("Date of Birth")}
-          </th>
-          <th className="text-start px-4 py-2">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {filteredUsers.length > 0 ? (
-          filteredUsers.map((user) => (
-            <tr key={user._id} className="border-b hover:bg-gray-100">
-              <td className="p-3 text-center">
-                <StatusIndicator
-                  status={user.isActive ? "Completed" : "Failed"}
-                />
-              </td>
-              <td className="p-3 text-black">{user.name}</td>
-              <td className="p-3 text-black">{user.mobileNumber}</td>
-              <td className="p-3 text-black">
-                {new Date(user.dateOfBirth).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </td>
-              <td className="p-3">
-                <Link href={`/View/${user._id}`}>
-                  <button className="flex items-center text-blue-500 hover:text-blue-700">
-                    View
-                  </button>
-                </Link>
-              </td>
-            </tr>
-          ))
-        ) : (
-          <tr>
-            <td colSpan="5" className="text-center p-3 text-gray-500">
-              No users found
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  </div> {/* End of the wrapper for vertical scrolling */}
-</div>
-
-
+      {/* Users Table */}
+      <div className="overflow-x-auto rounded-lg">
+        <div className="max-h-[67vh] overflow-y-auto">
+          {" "}
+          {/* Added a wrapper for vertical scrolling */}
+          <table className="min-w-full bg-white border text-black rounded-sm">
+            <thead className="py-3">
+              <tr className="text-gray-700 font-bold border-b bg-gray-200 py-3 text-start text-lg uppercase">
+                <th className="text-start px-4 py-2">Status</th>
+                <th
+                  className="text-start px-4 py-2 cursor-pointer relative"
+                  onClick={() => requestSort("Name")}
+                >
+                  Name {getSortIndicator("Name")}
+                </th>
+                <th
+                  className="text-start px-4 py-2 cursor-pointer relative"
+                  onClick={() => requestSort("Contact")}
+                >
+                  Contact {getSortIndicator("Contact")}
+                </th>
+                <th
+                  className="text-start px-4 py-2 cursor-pointer relative"
+                  onClick={() => requestSort("Date of Birth")}
+                >
+                  Date of Birth {getSortIndicator("Date of Birth")}
+                </th>
+                <th className="text-start px-4 py-2">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
+                  <tr key={user._id} className="border-b hover:bg-gray-100">
+                    <td className="p-3 text-center">
+                      <StatusIndicator
+                        status={user.isActive ? "Completed" : "Failed"}
+                      />
+                    </td>
+                    <td className="p-3 text-black">{user.name}</td>
+                    <td className="p-3 text-black">{user.mobileNumber}</td>
+                    <td className="p-3 text-black">
+                      {new Date(user.dateOfBirth).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </td>
+                    <td className="p-3">
+                      <Link href={`/View/${user._id}`}>
+                        <button className="flex items-center text-blue-500 hover:text-blue-700">
+                          View
+                        </button>
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center p-3 text-gray-500">
+                    No users found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>{" "}
+        {/* End of the wrapper for vertical scrolling */}
+      </div>
 
       {/* Popup Notification */}
       {showPopup && <PopUp message={popupMessage} />}

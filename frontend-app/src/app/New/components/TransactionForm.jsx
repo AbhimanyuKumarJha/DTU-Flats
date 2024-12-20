@@ -260,7 +260,7 @@ export const TransactionCard = ({
                   fromYear: year,
                 });
               }}
-              className={`mt-1 p-2 border rounded-md flex-grow ${
+              className={`mt-1 p-2 border  rounded-md flex-grow ${
                 mode === "edit" && index < existingTransactions.length
                   ? "bg-gray-100"
                   : ""

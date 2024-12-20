@@ -114,7 +114,7 @@ const PaymentCard = ({
                 setFromYear(year);
                 setFromMonth(month);
               }}
-              className={`mt-1 p-2 border rounded-md ${
+              className={`mt-1 p-2 border rounded-md   ${
                 mode === "edit" && index < existingTransactions.length
                   ? "bg-gray-100"
                   : ""

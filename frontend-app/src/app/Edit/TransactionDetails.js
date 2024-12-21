@@ -483,12 +483,3 @@ const TransactionDetails = ({ userId }) => {
 };
 
 export default TransactionDetails;
-// import React from 'react'
-
-// const TransactionDetails = ({userId}) => {
-//   return (
-//     <div>TransactionDetails</div>
-//   )
-// }
-
-// export default TransactionDetails

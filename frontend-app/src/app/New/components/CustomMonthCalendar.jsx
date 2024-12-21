@@ -4,8 +4,8 @@ import api from '@/app/lib/services/api';
 
 const CustomMonthCalendar = ({ 
   userId, 
-  selectedMonth, 
-  selectedYear, 
+  selectedMonth = new Date().getMonth() + 1,
+  selectedYear = new Date().getFullYear(),
   onSelect, 
   onClose 
 }) => {

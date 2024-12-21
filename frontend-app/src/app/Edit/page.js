@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import List from "./list";
+import List from "./List";
 
 const Page = () => {
   const [error, setError] = useState(null);

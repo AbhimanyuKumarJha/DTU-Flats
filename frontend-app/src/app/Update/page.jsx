@@ -1,28 +1,42 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import api from "../lib/services/api";
 import PopUp from "../utils/popup";
-
+import UserEditDetails from "../Edit/UserEditDetails";
 import PaymentCard from "./paymentCard.jsx";
 import { getNextMonthYear } from "../lib/utils/dateUtils"; // Utility function to get next month/year
+import { FaEye, FaDollarSign, FaEdit, FaSearch, FaUsers, FaUserCheck, FaUserTimes, FaArrowLeft, FaPlus, FaSortAlphaDown, FaSortAlphaUp } from 'react-icons/fa'; // Importing React icons
+import PaymentSection from "./PaymentSection";
 
-// Status Indicator Component
+// Status Indicator Component with enhanced styling
 const StatusIndicator = ({ status }) => {
-  let color = "gray";
-  if (status === "Completed") color = "green";
-  else if (status === "Pending") color = "yellow";
-  else if (status === "Failed") color = "red";
+  const statusConfig = {
+    Completed: "bg-green-500",
+    Pending: "bg-yellow-500",
+    Failed: "bg-red-500"
+  };
 
   return (
-    <div className="flex justify-center">
-      <span
-        className={`inline-block h-4 w-4 rounded-full bg-${color}-500`}
-        title={status}
-      ></span>
+    <div className="flex items-center justify-center gap-2">
+      <span className={`h-3 w-3 rounded-full ${statusConfig[status]} animate-pulse`}></span>
+      {/* <span className="text-sm font-medium text-gray-600">{status}</span> */}
     </div>
   );
 };
+
+// Stats Card Component
+const StatsCard = ({ icon: Icon, title, value, bgColor }) => (
+  <div className={`${bgColor} p-6 rounded-lg shadow-lg flex items-center space-x-4 transform hover:scale-105 transition-transform duration-200`}>
+    <div className="p-3 rounded-full bg-white bg-opacity-30">
+      <Icon className="h-8 w-8 text-white" />
+    </div>
+    <div>
+      <p className="text-white text-sm font-medium">{title}</p>
+      <p className="text-white text-2xl font-bold">{value}</p>
+    </div>
+  </div>
+);
 
 export default function Update() {
   const [paymentmode, setPaymentmode] = useState(false);
@@ -62,6 +76,15 @@ export default function Update() {
       },
     },
   ]);
+
+  // Edit User ID
+  const [editUserId, setEditUserId] = useState(null);
+
+  // Popup State for Payment Card
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+  // Create a ref for the PaymentSection
+  const paymentSectionRef = useRef(null);
 
   // Fetch all users when the component mounts
   const fetchUsers = async () => {
@@ -165,10 +188,15 @@ export default function Update() {
 
   const handleAddPayment = async (user) => {
     setSelectedUser(user);
-    setPaymentmode(true);
+    setShowPaymentModal(true);
     try {
       const transactions = await api.getTransactionsByUserId(user._id);
       setExistingTransactions(transactions);
+      
+      // Scroll to PaymentSection
+      if (paymentSectionRef.current) {
+        paymentSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     } catch (err) {
       console.error("Error fetching transactions:", err);
       setShowPopup(true);
@@ -330,13 +358,19 @@ export default function Update() {
           },
         },
       ]);
+
+      // Close the payment modal and scroll to the top
+      setShowPaymentModal(false);
+      window.scrollTo(0, 0); // Scroll to the top of the page
     } catch (err) {
       console.error("Error submitting transactions:", err);
       setShowPopup(true);
       setPopupMessage("Failed to add transactions.");
     }
   };
-
+  const handleEditUser = (userId) => {
+    setEditUserId(userId);
+  };
   // Utility to check if current month is already paid
   const isCurrentMonthPaid = () => {
     if (!existingTransactions || existingTransactions.length === 0)
@@ -398,103 +432,143 @@ export default function Update() {
     return <div className="text-center text-red-500 mt-10">{error}</div>;
   }
   return (
-    <>
-      
-      
-      <div className="flex flex-col mt-4 items-center justify-center">
-        <div className="w-2/3 mb-4">
-          <h2 className="text-lg font-semibold mt-5 mb-2">Search Resident</h2>
-          <input
-            type="text"
-            placeholder="Enter name"
-            className="border border-gray-300 rounded-md p-2 w-full mx-auto h-16 text-xl text-black focus:outline-none focus:ring-2 focus:shadow-lg "
-            value={filterName}
-            onChange={(e) => setFilterName(e.target.value)}
-          />
-          <p className="text-sm text-black">Enter at least 3 characters</p>
-        </div>
-        <div className="flex justify-center mb-4">
-          <img src="/DTU,_Delhi_official_logo.png" alt="DTU Flats Logo" className="h-24 text-4xl" />
-        </div>
-        <h1 className="text-5xl font-bold text-center mt-5 text-black mb-2">
-          Welcome to DTU Flats
-        </h1>
-       
-        
-        <div className="bg-white mt-20 bg-opacity-30 backdrop-blur-md p-4 rounded-lg shadow-lg text-center mb-4">
-          <h2 className="text-3xl font-semibold">Resident Statistics</h2>
-          <p className="text-xl font-bold">Total Residents: {totalResidents}</p>
-          <p className="text-xl font-bold">Active Residents: {activeResidents}</p>
-          <p className="text-xl font-bold">Inactive Residents: {inactiveResidents}</p>
+    <div className="min-h-screen  p-8">
+      {/* Header Section */}
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-center items-center mb-8">
+          <div className="flex items-center justify-center space-x-4">
+            <img src="/DTU,_Delhi_official_logo.png" alt="DTU Flats Logo" className="h-16 w-16 object-contain" />
+            <h1 className="text-4xl text-center font-bold text-gray-800 mx-auto">Delhi Technological University </h1>
+          </div>
         </div>
 
-        {
-          /* Display the table only if there are at least 3 characters in the input */
-          filterName.length >= 3 && (
-            <div className="w-4/5 bg-white rounded-md p-2">
-              {!paymentmode ? (
-                <table className="min-w-full bg-white border text-black rounded-sm mb-4">
-                  <thead className="py-3">
-                    <tr className="text-gray-700 font-bold border-b bg-gray-200 py-3 text-start text-lg uppercase">
-                      <th className="text-start px-4 py-2">Status</th>
-                      <th
-                        className="text-start px-4 py-2 cursor-pointer relative"
-                        onClick={() => requestSort("Name")}
+        {/* Search Section */}
+        <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg shadow-md p-5 mb-8">
+          <div className="relative">
+            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search residents by name..."
+              className="w-full pl-12 pr-4 py-3 text-black rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+              value={filterName}
+              onChange={(e) => setFilterName(e.target.value)}
+            />
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <StatsCard
+            icon={FaUsers}
+            title="Total Residents"
+            value={totalResidents}
+            bgColor="bg-gradient-to-r from-blue-500 to-blue-700"
+          />
+          <StatsCard
+            icon={FaUserCheck}
+            title="Active Residents"
+            value={activeResidents}
+            bgColor="bg-gradient-to-r from-green-500 to-green-700"
+          />
+          <StatsCard
+            icon={FaUserTimes}
+            title="Inactive Residents"
+            value={inactiveResidents}
+            bgColor="bg-gradient-to-r from-red-500 to-red-700"
+          />
+        </div>
+
+        {/* Residents Table */}
+        {filterName.length >= 3 && (
+          <div className="bg-white rounded-lg overflow-auto max-h-[55vh] shadow-md ">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs  text-gray-900 uppercase tracking-wider font-bold">
+                      Status
+                    </th>
+                    <th 
+                      className="px-6 py-3 text-center text-xs  text-gray-900 uppercase tracking-wider cursor-pointer font-bold"
+                      onClick={() => requestSort("Name")}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span>Name</span>
+                        {sortConfig.key === "Name" && (
+                          sortConfig.direction === "asc" ? <FaSortAlphaDown /> : <FaSortAlphaUp />
+                        )}
+                      </div>
+                    </th>
+                    <th 
+                      className="px-6 py-3 text-center text-xs  text-gray-900 uppercase tracking-wider cursor-pointer font-bold"
+                      onClick={() => requestSort("Contact")}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span>Contact</span>
+                        {sortConfig.key === "Contact" && (
+                          sortConfig.direction === "asc" ? <FaSortAlphaDown /> : <FaSortAlphaUp />
+                        )}
+                      </div>
+                    </th>
+                    <th 
+                      className="px-6 py-3 text-center text-xs  text-gray-900 uppercase tracking-wider cursor-pointer font-bold"
+                      onClick={() => requestSort("Date of Birth")}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span>Date of Birth</span>
+                        {sortConfig.key === "Date of Birth" && (
+                          sortConfig.direction === "asc" ? <FaSortAlphaDown /> : <FaSortAlphaUp />
+                        )}
+                      </div>
+                    </th>
+                    <th className="px-6 py-3 text-center text-xs  text-gray-900 uppercase tracking-wider font-bold">
+                      View
+                    </th>
+                    <th className="px-6 py-3 text-center text-xs  text-gray-900 uppercase tracking-wider font-bold">
+                      Add Payment
+                    </th>
+                    <th className="px-6 py-3 text-center text-xs  text-gray-900 uppercase tracking-wider font-bold">
+                      Edit
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y  divide-gray-200">
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
+                      <tr
+                        key={user._id}
+                        className="border-b hover:bg-gray-100"
                       >
-                        Name {getSortIndicator("Name")}
-                      </th>
-                      <th
-                        className="text-start px-4 py-2 cursor-pointer relative"
-                        onClick={() => requestSort("Contact")}
-                      >
-                        Contact {getSortIndicator("Contact")}
-                      </th>
-                      <th
-                        className="text-start px-4 py-2 cursor-pointer relative"
-                        onClick={() => requestSort("Date of Birth")}
-                      >
-                        Date of Birth {getSortIndicator("Date of Birth")}
-                      </th>
-                      <th className="text-start px-4 py-2">View</th>
-                      <th className="text-start px-4 py-2">Add Payment</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredUsers.length > 0 ? (
-                      filteredUsers.map((user) => (
-                        <tr
-                          key={user._id}
-                          className="border-b hover:bg-gray-100"
-                        >
-                          <td className="p-3 text-center">
-                            <StatusIndicator
-                              status={user.isActive ? "Completed" : "Failed"}
-                            />
-                          </td>
-                          <td className="p-3 text-black">{user.name}</td>
-                          <td className="p-3 text-black">
-                            {user.mobileNumber}
-                          </td>
-                          <td className="p-3 text-black">
-                            {new Date(user.dateOfBirth).toLocaleDateString(
-                              "en-US",
-                              {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                              }
-                            )}
-                          </td>
-                          <td className="p-3">
-                            <Link href={`/View/${user._id}`}>
-                              <button className="flex items-center text-blue-500 hover:text-blue-700">
-                                View
-                              </button>
-                            </Link>
-                          </td>
-                          <td className="p-3">
+                        <td className="p-3 text-center">
+                          <StatusIndicator
+                            status={user.isActive ? "Completed" : "Failed"}
+                          />
+                        </td>
+                        <td className="p-3 text-black">{user.name}</td>
+                        <td className="p-3 text-black">
+                          {user.mobileNumber}
+                        </td>
+                        <td className="p-3 text-black">
+                          {new Date(user.dateOfBirth).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            }
+                          )}
+                        </td>
+                        <td className="p-3 text-center">
+                          <Link href={`/View/${user._id}`}>
+                            <button className="flex items-center text-blue-500 hover:text-blue-700">
+                              <FaEye className="mr-1" /> View
+                            </button>
+                          </Link>
+                        </td>
+                        <td className="p-3 text-center">
+                          <div className="flex justify-center">
                             <button
-                              className={`text-center self-center flex items-center text-blue-500 hover:text-blue-700 ${
+                              className={`flex items-center text-blue-500 hover:text-blue-700 ${
                                 isCurrentMonthPaidForUser(user)
                                   ? "cursor-not-allowed opacity-50"
                                   : ""
@@ -507,97 +581,66 @@ export default function Update() {
                                   : "Add Payment"
                               }
                             >
+                              <FaDollarSign className="mr-1" />
                               {isCurrentMonthPaidForUser(user)
                                 ? "Payment Done"
                                 : "Add"}
                             </button>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan="6"
-                          className="text-center p-3 text-gray-500"
-                        >
-                          No users found
+                          </div>
+                        </td>
+                        <td className="p-3 text-center">
+                          <button
+                            className="flex items-center text-blue-500 hover:text-blue-700"
+                            onClick={() => handleEditUser(user._id)}
+                          >
+                            <FaEdit className="mr-1" /> Edit
+                          </button>
                         </td>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              ) : (
-                <div className="w-full">
-                  <button
-                    onClick={handleBack}
-                    className="mb-4 flex items-center text-blue-500 hover:text-blue-700"
-                  >
-                    &larr; Back to Users
-                  </button>
-                  {isCurrentMonthPaid() ? (
-                    <div className="text-center text-green-500 font-semibold mb-4">
-                      Payment for the current month is already done.
-                    </div>
+                    ))
                   ) : (
-                    <>
-                      <div className="mb-4">
-                        <div className=" text-black font-semibold">
-                          Name: {selectedUser.name}
-                        </div>
-                        <div className=" text-black font-semibold">
-                          Contact: {selectedUser.mobileNumber}
-                        </div>
-                        <div className=" text-black font-semibold">
-                          Floor discount:{" "}
-                          {selectedUser.floorNumber.length === 4 ? "Yes" : "No"}
-                        </div>
-                      </div>
-
-                      <div className="text-black">
-                        {transactions.map((txn, index) => (
-                          <PaymentCard
-                            key={index}
-                            isFloorDiscount={
-                              selectedUser.floorNumber.length === 4
-                                ? true
-                                : false
-                            }
-                            transaction={txn}
-                            index={index}
-                            isFirst={index === 0}
-                            onUpdate={(updatedTxn) =>
-                              handleTransactionUpdate(index, updatedTxn)
-                            }
-                            onRemove={() => {
-                              const updated = transactions.filter(
-                                (_, i) => i !== index
-                              );
-                              setTransactions(updated);
-                            }}
-                            isOnly={transactions.length === 1}
-                            mode="create"
-                            userId={selectedUser._id}
-                          />
-                        ))}
-                        <button
-                          className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 ml-2"
-                          onClick={handleTransactionSubmit}
-                        >
-                          Submit Transactions
-                        </button>
-                      </div>
-                    </>
+                    <tr>
+                      <td
+                        colSpan="6"
+                        className="text-center p-3 text-gray-500"
+                      >
+                        No users found
+                      </td>
+                    </tr>
                   )}
-                </div>
-              )}
+                </tbody>
+              </table>
             </div>
-          )
-        }
+          </div>
+        )}
+
+        {/* Payment Mode Popup */}
+        {showPaymentModal && (
+          <div ref={paymentSectionRef}>
+            <PaymentSection
+              selectedUser={selectedUser}
+              transactions={transactions}
+              handleTransactionUpdate={handleTransactionUpdate}
+              setTransactions={setTransactions}
+              handleTransactionSubmit={handleTransactionSubmit}
+              setShowPaymentModal={setShowPaymentModal}
+            />
+          </div>
+        )}
+
+        {/* Popups and Modals */}
+        {showPopup && (
+          <PopUp message={popupMessage} close={() => setShowPopup(false)} />
+        )}
+        {editUserId && (
+          <UserEditDetails
+            userId={editUserId}
+            onClose={() => setEditUserId(null)}
+            onUpdate={fetchUsers}
+          />
+        )}
       </div>
-      {showPopup && (
-        <PopUp message={popupMessage} close={() => setShowPopup(false)} />
-      )}
-    </>
+    </div>
   );
 
   // Helper function to check if a specific user has paid for the current month
@@ -618,4 +661,7 @@ export default function Update() {
         ) && txn.status === "Completed"
     );
   }
+
+  // Add this function to handle the edit action
+  
 }

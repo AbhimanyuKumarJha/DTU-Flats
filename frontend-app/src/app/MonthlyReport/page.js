@@ -209,19 +209,9 @@ const UserTransactionFilter = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [loading, setLoading] = useState(false);
-  const [month, setMonth] = useState(() => {
-    return localStorage.getItem("month")
-      ? Number(localStorage.getItem("month"))
-      : 1;
-  });
-  const [paymentStatus, setPaymentStatus] = useState(() => {
-    return localStorage.getItem("paymentStatus") || "Completed";
-  });
-  const [year, setYear] = useState(() => {
-    return localStorage.getItem("year")
-      ? Number(localStorage.getItem("year"))
-      : new Date().getFullYear();
-  });
+  const [month, setMonth] = useState(1);
+  const [paymentStatus, setPaymentStatus] = useState("Completed");
+  const [year, setYear] = useState(new Date().getFullYear());
   const [userCounts, setUserCounts] = useState({
     paid: 0,
     pending: 0,
@@ -239,6 +229,16 @@ const UserTransactionFilter = () => {
   const [baseRent, setBaseRent] = useState(0);
   const [discounts, setDiscounts] = useState({ floor: 0, year: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const storedMonth = localStorage.getItem("month");
+    const storedYear = localStorage.getItem("year");
+    const storedPaymentStatus = localStorage.getItem("paymentStatus");
+
+    if (storedMonth) setMonth(Number(storedMonth));
+    if (storedYear) setYear(Number(storedYear));
+    if (storedPaymentStatus) setPaymentStatus(storedPaymentStatus);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("month", month);

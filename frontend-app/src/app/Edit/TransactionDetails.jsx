@@ -227,7 +227,7 @@ const TransactionCard = ({
   );
 
   return (
-    <div className="bg-white shadow-lg hover:shadow-xl border border-gray-100 hover:border-gray-200 transition-all duration-300 rounded-xl p-8 grid grid-cols-2 gap-6 items-start md:w-4/5 lg:w-4/5 mx-auto">
+    <div className="bg-white bg-opacity-60 shadow-lg hover:shadow-xl border border-gray-100 hover:border-gray-200 transition-all duration-300 rounded-xl p-8 grid grid-cols-2 gap-6 items-start md:w-4/5 lg:w-4/5 mx-auto">
       {/* Transaction Period */}
       {/* <button 
         onClick={() => setShowDeleteConfirm(true)}
@@ -389,7 +389,7 @@ const TransactionCard = ({
 
       {/* Delete Success Modal */}
       {showDeleteSuccess && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-green-400 bg-opacity-45 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl">
             <p className="text-green-600 font-semibold">Transaction deleted successfully!</p>
           </div>
@@ -453,7 +453,7 @@ const TransactionDetails = ({ userId }) => {
 
   return (
     <>
-      <h1 className="mx-auto text-center text-2xl font-bold text-blue-100">
+      <h1 className="mx-auto text-center text-black text-2xl font-bold mb-2">
         {loading ? "Loading..." : transactions.length > 0 ? "Transactions" : "No Transactions Available"}
       </h1>
       {loading ? (
@@ -461,7 +461,7 @@ const TransactionDetails = ({ userId }) => {
           <div className="loader"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 overflow-auto max-h-[80vh]">
+        <div className="grid grid-cols-1 bg-opacity-60 gap-6 overflow-auto max-h-[80vh]">
           {error && <div className="text-red-500">{error}</div>}
           {transactions.length > 0 ? (
             transactions.map((transaction) => (

@@ -113,7 +113,7 @@ const TransactionForm = ({
   return (
     <div className="space-y-6 text-black">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Transactions</h2>
+        <h2 className="text-2xl  font-bold">Transactions</h2>
         <button
           type="button"
           onClick={addNewTransaction}

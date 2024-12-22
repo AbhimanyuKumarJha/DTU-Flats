@@ -77,8 +77,13 @@ const UserEditDetails = ({ userId, onClose, onUpdate }) => {
   }, [userId]);
 
   const handleUpdate = async () => {
-    await onUpdate();
-    onClose();
+    try {
+      await api.updateUser(editUser.id, editUser);
+      await onUpdate();
+      onClose();
+    } catch (error) {
+      console.error("Error updating user details:", error);
+    }
   };
 
   return (

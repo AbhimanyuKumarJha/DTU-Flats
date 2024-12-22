@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import api from "../lib/services/api";
 import Link from "next/link";
 import { FaSpinner, FaTimes, FaMoneyBillWave } from "react-icons/fa";
+import UserEditDetails from "../Edit/UserEditDetails";
 
 const StatusIndicator = ({ status, type }) => {
   let color = "gray";
@@ -309,7 +310,23 @@ const UserTransactionFilter = () => {
       console.error("Error calculating total collection:", error);
     }
   };
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await api.getAllUsers();
+      setUsers(data);
+      setFilteredUsers(data);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      setError("Failed to load users.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    fetchUsersAndFilter(); 
+  }, []);
   const fetchUsersAndFilter = async () => {
     setLoading(true);
     try {
@@ -417,10 +434,14 @@ const UserTransactionFilter = () => {
   useEffect(() => {
     fetchUsersAndFilter();
   }, [month, year, paymentStatus, sortConfig]);
+  const handleEditUser = (userId) => {
+    setEditUserId(userId);
+  };
+  const [editUserId, setEditUserId] = useState(null);
 
   const getSortIndicator = (key) => {
     if (sortConfig.key === key) {
-      return sortConfig.direction === "asc" ? "▲" : "��";
+      return sortConfig.direction === "asc" ? "▲" : "▼";
     }
     return "";
   };
@@ -551,7 +572,13 @@ const UserTransactionFilter = () => {
           </Modal> */}
         </div>
       </div>
-
+      {editUserId && (
+          <UserEditDetails
+            userId={editUserId}
+            onClose={() => setEditUserId(null)}
+            onUpdate={fetchUsersAndFilter }
+          />
+        )}
       {loading ? (
         <div className="flex justify-center items-center">
           <FaSpinner className="animate-spin text-black" size={24} />
@@ -583,6 +610,7 @@ const UserTransactionFilter = () => {
                       Date of Birth {getSortIndicator("Date of Birth")}
                     </th>
                     <th className="text-center px-4 py-2">Action</th>
+                    <th className="text-center px-4 py-2">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -610,7 +638,14 @@ const UserTransactionFilter = () => {
                               View
                             </button>
                           </Link>
+                          < >
+                            <button onClick={() => handleEditUser(user._id)}
+                             className="flex items-center ml-4 text-blue-500 hover:text-blue-700">
+                              Edit
+                            </button>
+                          </>
                         </td>
+                        
                       </tr>
                     ))
                   ) : (

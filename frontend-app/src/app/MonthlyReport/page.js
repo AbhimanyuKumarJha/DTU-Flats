@@ -236,9 +236,9 @@ const UserTransactionFilter = () => {
     const storedYear = localStorage.getItem("year");
     const storedPaymentStatus = localStorage.getItem("paymentStatus");
 
-    if (storedMonth) setMonth(Number(storedMonth));
-    if (storedYear) setYear(Number(storedYear));
-    if (storedPaymentStatus) setPaymentStatus(storedPaymentStatus);
+    if (storedMonth && month === 1) setMonth(Number(storedMonth));
+    if (storedYear && year === new Date().getFullYear()) setYear(Number(storedYear));
+    if (storedPaymentStatus && paymentStatus === "Completed") setPaymentStatus(storedPaymentStatus);
   }, []);
 
   useEffect(() => {
@@ -610,7 +610,7 @@ const UserTransactionFilter = () => {
                       Date of Birth {getSortIndicator("Date of Birth")}
                     </th>
                     <th className="text-center px-4 py-2">Action</th>
-                    <th className="text-center px-4 py-2">Action</th>
+                    {/* <th className="text-center px-4 py-2">Action</th> */}
                   </tr>
                 </thead>
                 <tbody>

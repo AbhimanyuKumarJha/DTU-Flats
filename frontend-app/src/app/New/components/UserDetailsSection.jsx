@@ -12,6 +12,7 @@ import {
   FaFileAlt,
   FaPhoneAlt,
   FaRupeeSign,
+  FaEnvelope,
 } from "react-icons/fa";
 import { useRouter } from "next/router";
   
@@ -299,6 +300,55 @@ const UserDetailsSection = ({
               {formData.isActive ? "Active" : "Non-Active"}
             </span>
           </label>
+        </div>
+
+        {/* Email Field */}
+        <div className="flex flex-col">
+          <label className="font-semibold text-black">Email:</label>
+          <div className="relative">
+            <FaEnvelope className="absolute top-3 left-2 text-gray-500" />
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+              className={`w-full p-2 pl-8 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all hover:border-blue-500 hover:ring-2 hover:ring-blue-300 ${
+                errors.email ? "border-red-500" : ""
+              }`}
+            />
+          </div>
+          {errors.email && (
+            <span className="text-red-500 text-sm mt-1">{errors.email}</span>
+          )}
+        </div>
+
+        {/* Alternate Email Field */}
+        <div className="flex flex-col">
+          <label className="font-semibold text-black">
+            Alternate Email <span className="text-gray-500">(Optional)</span>:
+          </label>
+          <div className="relative">
+            <FaEnvelope className="absolute top-3 left-2 text-gray-500" />
+            <input
+              type="email"
+              name="alternateEmail"
+              value={formData.alternateEmail}
+              onChange={handleChange}
+              placeholder="Enter alternate email"
+              className={`w-full p-2 pl-8 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all hover:border-blue-500 hover:ring-2 hover:ring-blue-300 ${
+                errors.alternateEmail ? "border-red-500" : ""
+              }`}
+            />
+          </div>
+          <span className="text-gray-500 text-sm mt-1">
+            Leave blank if you don't want to provide an alternate email.
+          </span>
+          {errors.alternateEmail && (
+            <span className="text-red-500 text-sm mt-1">
+              {errors.alternateEmail}
+            </span>
+          )}
         </div>
 
         <button

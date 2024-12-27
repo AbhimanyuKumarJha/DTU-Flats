@@ -23,6 +23,8 @@ const Form = ({
     alternateMobileNumber: data?.alternateMobileNumber || "",
     isActive: data?.isActive || false,
     certificateIssued: data?.certificateIssued || "",
+    email: data?.email || "",
+    alternateEmail: data?.alternateEmail || "",
   });
   const [errors, setErrors] = useState({});
 
@@ -41,11 +43,21 @@ const Form = ({
     setLoading(true);
     scrollToTop(); // Scroll to top on submit
 
+    // Check if email is provided
+    if (!userData.email) {
+        setErrors({ email: "Email is required" });
+        setLoading(false);
+        return; // Prevent submission if email is missing
+    }
+
     try {
       const processedData = {
         ...userData,
         alternateMobileNumber: userData.alternateMobileNumber || undefined,
+        alternateEmail: userData.alternateEmail || undefined,
       };
+
+      console.log("Processed Data:", processedData); // Log the processed data
 
       const validatedData = userSchema.parse(processedData);
 
@@ -71,6 +83,8 @@ const Form = ({
           alternateMobileNumber: "",
           isActive: false,
           certificateIssued: "",
+          email: "",
+          alternateEmail: "",
         });
         setErrors({});
         scrollToTop(); // Ensure scroll bar moves up

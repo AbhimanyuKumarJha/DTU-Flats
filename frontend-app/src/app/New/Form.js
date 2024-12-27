@@ -60,7 +60,13 @@ const Form = ({
       console.log("Processed Data:", processedData); // Log the processed data
 
       const validatedData = userSchema.parse(processedData);
+      // validatedData = {
+      //   ...validatedData,
+      //   email: userData.email,
+      //   alternateEmail: userData.alternateEmail || undefined,
+      // }
       console.log("validated Data:", validatedData );
+
       if (mode === "edit" && data?.id) {
         await api.updateUser(data.id, validatedData);
       } else {

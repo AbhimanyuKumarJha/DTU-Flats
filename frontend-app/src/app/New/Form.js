@@ -53,14 +53,14 @@ const Form = ({
     try {
       const processedData = {
         ...userData,
-        alternateMobileNumber: userData.alternateMobileNumber || undefined,
+        email: userData.email,
         alternateEmail: userData.alternateEmail || undefined,
       };
 
       console.log("Processed Data:", processedData); // Log the processed data
 
       const validatedData = userSchema.parse(processedData);
-
+      console.log("validated Data:", validatedData );
       if (mode === "edit" && data?.id) {
         await api.updateUser(data.id, validatedData);
       } else {

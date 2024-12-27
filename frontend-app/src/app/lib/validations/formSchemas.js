@@ -33,6 +33,11 @@ export const userSchema = z.object({
     .optional(),
   isActive: z.boolean(),
   certificateIssued: z.enum(CERTIFICATE_OPTIONS),
+  email: z.string().email("Invalid email address"),
+  alternateEmail: z
+    .string()
+    .email("Invalid alternate email address")
+    .optional(),
 });
 
 export const transactionSchema = z.object({

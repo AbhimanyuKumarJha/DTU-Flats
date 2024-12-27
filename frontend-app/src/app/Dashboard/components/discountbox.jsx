@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import api from "../../lib/services/api";
 import { discountSchema } from "../../lib/validations/formSchemas";
 import { motion, AnimatePresence } from "framer-motion";
+import Loader from './Loader';
 
 export const DiscountBox = () => {
   const [onYear, setOnYear] = useState(0);
@@ -42,7 +43,7 @@ export const DiscountBox = () => {
     }
   };
 
-  if (loading) return <p>bb</p>;
+  if (loading) return <Loader />;
 
   return (
     <motion.div

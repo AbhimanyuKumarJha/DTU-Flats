@@ -63,6 +63,10 @@ const RentList = () => {
         })
         .then((data) => {
           setRentList([...rentList, data]);
+          setCreationTimestamps((prev) => ({
+            ...prev,
+            [data._id]: new Date(data.createdAt).getTime(),
+          }));
           setRentRate("");
           setFromDate("");
           setShowAddConfirmation(false);

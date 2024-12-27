@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FaTrash, FaCalendar, FaEye, FaCreditCard, FaMoneyBill, FaClipboard, FaCheckCircle } from "react-icons/fa";
+import { FaTrash, FaCalendar, FaEye, FaCreditCard, FaMoneyBill, FaClipboard, FaCheckCircle, FaTimes } from "react-icons/fa";
 import { useRentCalculation } from "../lib/hooks/useRentCalculation";
 import {
   PAYMENT_MODES,
@@ -18,6 +18,7 @@ const PaymentCard = ({
   mode,
   isFloorDiscount,
   userId,
+  onClose
 }) => {
   const [fromMonth, setFromMonth] = useState(transaction.fromMonth);
   const [fromYear, setFromYear] = useState(transaction.fromYear);
@@ -98,9 +99,18 @@ const PaymentCard = ({
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex justify-center items-center min-h-screen ">
       <div className="bg-gradient-to-br from-white via-gray-50 to-blue-50 p-8 max-w-fit rounded-2xl shadow-lg border border-gray-200 transition-all duration-300 hover:shadow-2xl hover:scale-[1.01] relative overflow-hidden">
-        {/* Decorative Elements */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-white transform hover:scale-110 hover:rotate-90 transition-all duration-300 shadow-md hover:shadow-lg group z-10"
+        >
+          <FaTimes className="w-5 h-5" />
+          <span className="absolute -top-8 right-0 bg-gray-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+            
+          </span>
+        </button>
+
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 opacity-20 rounded-full transform translate-x-16 -translate-y-16"></div>
         
@@ -128,7 +138,6 @@ const PaymentCard = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-          {/* Date Range Selection */}
           <div className="flex flex-col relative space-y-3">
             <label className="font-semibold text-gray-700 flex items-center gap-2 text-lg">
               <FaCalendar className="text-blue-500" /> From Month
@@ -217,7 +226,6 @@ const PaymentCard = ({
             )}
           </div>
 
-          {/* Calculated Amount Display */}
           <div className="flex flex-col space-y-3">
             <label className="font-semibold text-gray-700 flex items-center gap-2 text-lg">
               <FaMoneyBill className="text-green-500" /> Total Amount
@@ -243,7 +251,6 @@ const PaymentCard = ({
             )}
           </div>
 
-          {/* Payment Mode Selection */}
           <div className="flex flex-col space-y-3">
             <label className="font-semibold text-gray-700 flex items-center gap-2 text-lg">
               <FaCreditCard className="text-indigo-500" /> Payment Mode
@@ -261,7 +268,6 @@ const PaymentCard = ({
             </select>
           </div>
 
-          {/* Payment Status */}
           <div className="flex flex-col space-y-3 md:col-span-2">
             <label className="font-semibold text-gray-700 flex items-center gap-2 text-lg">
               <FaCheckCircle className="text-blue-500" /> Payment Status
@@ -290,7 +296,6 @@ const PaymentCard = ({
             </select>
           </div>
 
-          {/* Conditional Payment Details */}
           {transaction.paymentMode === PAYMENT_MODES.UPI && (
             <div className="flex flex-col space-y-3 md:col-span-2">
               <label className="font-semibold text-gray-700 flex items-center gap-2 text-lg">

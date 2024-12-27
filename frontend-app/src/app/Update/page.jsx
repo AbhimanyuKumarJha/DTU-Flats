@@ -6,7 +6,7 @@ import PopUp from "../utils/popup";
 import UserEditDetails from "../Edit/UserEditDetails";
 import PaymentCard from "./paymentCard.jsx";
 import { getNextMonthYear } from "../lib/utils/dateUtils"; // Utility function to get next month/year
-import { FaEye, FaDollarSign, FaEdit, FaSearch, FaUsers, FaUserCheck, FaUserTimes, FaArrowLeft, FaPlus, FaSortAlphaDown, FaSortAlphaUp } from 'react-icons/fa'; // Importing React icons
+import { FaEye, FaDollarSign, FaEdit, FaSearch, FaUsers, FaUserCheck, FaUserTimes, FaArrowLeft, FaPlus, FaSortAlphaDown, FaSortAlphaUp, FaSpinner, FaCog, FaDatabase, FaExclamationCircle } from 'react-icons/fa'; // Importing React icons
 import PaymentSection from "./PaymentSection";
 
 // Status Indicator Component with enhanced styling
@@ -37,6 +37,37 @@ const StatsCard = ({ icon: Icon, title, value, bgColor }) => (
     </div>
   </div>
 );
+
+// Loading Screen Component
+const LoadingScreen = () => {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center  bg-opacity-35 ">
+      <div className="flex flex-col items-center space-y-8">
+        {/* Primary spinner */}
+        <div className="relative">
+          <FaSpinner className="w-16 h-16 text-blue-500 animate-spin" />
+          <FaCog className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 text-blue-700 animate-spin-slow" />
+        </div>
+        
+        {/* Loading text with data icons */}
+        <div className="flex items-center space-x-3">
+          <FaDatabase className="w-5 h-5 text-blue-500 animate-bounce" />
+          <span className="text-xl font-semibold text-black">Loading Data</span>
+          <div className="flex space-x-1">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '200ms' }} />
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '400ms' }} />
+          </div>
+        </div>
+        
+        {/* Progress bar */}
+        <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="h-full bg-blue-500 animate-progress rounded-full" />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function Update() {
   const [paymentmode, setPaymentmode] = useState(false);
@@ -425,27 +456,34 @@ export default function Update() {
   const inactiveResidents = totalResidents - activeResidents;
 
   if (loading) {
-    return <div className="text-center mt-10">Loading...</div>;
+    return <LoadingScreen />;
   }
 
   if (error) {
-    return <div className="text-center text-red-500 mt-10">{error}</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center p-8 bg-red-50 rounded-lg shadow-lg">
+          <FaExclamationCircle className="mx-auto text-red-500 text-4xl mb-4 animate-bounce" />
+          <div className="text-red-500 text-xl font-semibold">{error}</div>
+        </div>
+      </div>
+    );
   }
   return (
     <div className="min-h-screen  p-8">
       {/* Header Section */}
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-center items-center mb-8">
+        <div className="flex justify-center items-center mb-8 transform hover:scale-105 transition-transform duration-300">
           <div className="flex items-center justify-center space-x-4">
-            <img src="/DTU,_Delhi_official_logo.png" alt="DTU Flats Logo" className="h-16 w-16 object-contain" />
-            <h1 className="text-4xl text-center font-bold text-gray-800 mx-auto">Delhi Technological University </h1>
+            <img src="/DTU,_Delhi_official_logo.png" alt="DTU Flats Logo" className="h-16 w-16 object-contain animate-pulse" />
+            <h1 className="text-4xl text-center font-bold text-gray-800 mx-auto">Delhi Technological University</h1>
           </div>
         </div>
 
-        {/* Search Section */}
-        <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg shadow-md p-5 mb-8">
+        {/* Search Section with animation */}
+        <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg shadow-md p-5 mb-8 transform hover:shadow-lg transition-all duration-300">
           <div className="relative">
-            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 animate-pulse" />
             <input
               type="text"
               placeholder="Search residents by name..."

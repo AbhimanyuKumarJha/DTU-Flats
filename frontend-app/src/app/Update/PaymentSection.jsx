@@ -69,7 +69,7 @@ const PaymentSection = ({ selectedUser, transactions, handleTransactionUpdate, s
       </div>
 
       {/* Transactions Section */}
-      <div className="space-y-2 -mb-24">
+      <div className="space-y-2 -mb-24 mt-14">
         {transactions.map((txn, index) => (
           <PaymentCard
             key={index}

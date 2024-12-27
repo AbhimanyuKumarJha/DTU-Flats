@@ -59,6 +59,18 @@ const userSchema = new mongoose.Schema({
       ref: "Transaction",
     },
   ],
+  email: {
+    type: String,
+    required: [true, "Email is required"],
+    unique: true,
+    trim: true,
+    lowercase: true,
+  },
+  alternateEmail: {
+    type: String,
+    trim: true,
+    lowercase: true,
+  },
 });
 
 function arrayLimit(val) {

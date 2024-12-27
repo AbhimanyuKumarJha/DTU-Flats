@@ -6,7 +6,7 @@ const api = {
   // User APIs
   createUser: async (userData) => {
     try {
-      console.log("userData:", userData);
+      // console.log("userData:", userData);
       const response = await axios.post(`${BASE_URL}/users`, userData);
       return response.data;
     } catch (error) {

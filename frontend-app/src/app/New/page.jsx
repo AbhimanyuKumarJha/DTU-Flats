@@ -3,6 +3,7 @@ import Form from "./Form";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Loader from "./components/Loader";
 
 const AddPage = () => {
   const { data: session, status } = useSession();
@@ -15,7 +16,7 @@ const AddPage = () => {
   }, [status, router]);
 
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return <Loader/>;
   }
 
   return (

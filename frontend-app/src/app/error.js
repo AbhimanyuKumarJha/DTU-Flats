@@ -44,7 +44,7 @@ const AuthError = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-gray-50 to-blue-50 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center   p-4 relative overflow-hidden">
       {/* Animated background patterns */}
       <div className="absolute inset-0">
         <div className="absolute top-0 left-0 w-64 h-64 bg-red-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" />

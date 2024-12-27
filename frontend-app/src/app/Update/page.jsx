@@ -8,6 +8,7 @@ import PaymentCard from "./paymentCard.jsx";
 import { getNextMonthYear } from "../lib/utils/dateUtils"; // Utility function to get next month/year
 import { FaEye, FaDollarSign, FaEdit, FaSearch, FaUsers, FaUserCheck, FaUserTimes, FaArrowLeft, FaPlus, FaSortAlphaDown, FaSortAlphaUp, FaSpinner, FaCog, FaDatabase, FaExclamationCircle } from 'react-icons/fa'; // Importing React icons
 import PaymentSection from "./PaymentSection";
+import Loader from "../New/components/Loader";
 
 // Status Indicator Component with enhanced styling
 const StatusIndicator = ({ status }) => {
@@ -456,7 +457,7 @@ export default function Update() {
   const inactiveResidents = totalResidents - activeResidents;
 
   if (loading) {
-    return <LoadingScreen />;
+    return <Loader />;
   }
 
   if (error) {

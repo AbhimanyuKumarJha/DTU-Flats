@@ -105,7 +105,7 @@ const RentList = () => {
 
   return (
     <div className="flex flex-col items-center h-full w-full rounded-lg bg-white bg-opacity-55 backdrop-blur-sm p-4 text-gray-800">
-      <h1 className="text-2xl font-bold mt-3 mb-3">Rent History</h1>
+      <h1 className="text-2xl font-bold mt-3 mb-3">Maintenance Charges History</h1>
 
       {loading ? (
         <FaSpinner className="animate-spin text-blue-500" size={24} />
@@ -148,7 +148,7 @@ const RentList = () => {
                 className="grid grid-cols-9 gap-4 rounded-md bg-slate-200 p-2 items-center w-full"
               >
                 <p className="col-span-4">
-                  <b>Rent Rate:</b> {rent.amount}
+                  <b>Maintenance Charges:</b> {rent.amount}
                 </p>
                 <p className="col-span-4">
                   <b>From Date:</b> {formatDisplayDate(rent.effectiveDate)}
@@ -168,7 +168,7 @@ const RentList = () => {
             ))}
           </div>
           <div className=" text-red-700 font-bold mt-2">
-            ( Rent Rate can be edit only within 24 hours )
+            ( Maintenance Charges can be edit only within 24 hours )
           </div>
 
           <DiscountBox />
@@ -200,10 +200,10 @@ const RentList = () => {
           {/* Confirmation for addition */}
           {showAddConfirmation && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div className="bg-white p-6 rounded-lg shadow-lg">
+              <div className="bg-white max-w-96 p-6 rounded-lg shadow-lg">
                 <h2 className="text-lg font-bold mb-4">Confirm Addition</h2>
                 <p className="mb-4">
-                  Are you sure you want to add a rent rate of {rentRate} starting from {fromDate}?
+                  Are you sure you want to add a maintenance charge of {rentRate} starting from {fromDate}?
                 </p>
                 <div className="flex justify-end gap-4">
                   <button

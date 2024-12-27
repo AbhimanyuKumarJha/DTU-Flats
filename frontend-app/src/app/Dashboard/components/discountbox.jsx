@@ -52,7 +52,7 @@ export const DiscountBox = () => {
     >
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-blue-100">
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
-          <h2 className="text-xl font-semibold text-white">Rent Discount</h2>
+          <h2 className="text-xl font-semibold text-white">Discounts</h2>
         </div>
         
         <div className="p-6">

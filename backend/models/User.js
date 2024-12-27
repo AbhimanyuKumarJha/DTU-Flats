@@ -61,13 +61,13 @@ const userSchema = new mongoose.Schema({
   ],
   email: {
     type: String,
-    trim: true,
+    
     lowercase: true,
     required: [true, "Email is required"],
   },
   alternateEmail: {
     type: String,
-    trim: true,
+    
     lowercase: true,
   },
 });

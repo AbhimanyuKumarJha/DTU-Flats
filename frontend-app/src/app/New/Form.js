@@ -136,7 +136,11 @@ const Form = ({
 
       {/* User Details Section */}
       <UserDetailsSection
-        formData={formData}
+        formData={{
+          ...formData,
+          email: formData.email,
+          alternateEmail: formData.alternateEmail,
+        }}
         setFormData={setFormData}
         onSubmit={handleUserSubmit}
         errors={errors}

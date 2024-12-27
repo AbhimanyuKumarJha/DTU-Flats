@@ -5,6 +5,7 @@ import Link from "next/link";
 import api from "../lib/services/api";
 import PopUp from "../utils/popup";
 import { FaFileDownload } from "react-icons/fa";
+import Loader from "../New/components/Loader";
 
 // Status Indicator Component
 const StatusIndicator = ({ status }) => {
@@ -143,7 +144,7 @@ const ViewPage = () => {
   };
 
   if (loading) {
-    return <div className="text-center mt-10">Loading...</div>;
+    return <Loader/>;
   }
 
   if (error) {

@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import api from "../lib/services/api";
 import { generateAndDownloadPDF } from "../lib/utils/pdfGenerator"; // Import the PDF generator
-
+import Loader from "../New/components/Loader";
+import { FaDownload } from "react-icons/fa"; // Import the download icon
 // Helper function to get month name from month number
 const getMonthName = (monthNumber) => {
   const date = new Date();
@@ -252,7 +253,7 @@ const TransactionPage = () => {
   };
 
   if (loading) {
-    return <div className="text-center mt-10">Loading...</div>;
+    return <Loader/>;
   }
 
   if (error) {
@@ -319,10 +320,10 @@ const TransactionPage = () => {
           />
         </div>
       </div>
-      <div className="flex  text-black font-bold text-lg">
+      {/* <div className="flex  text-black font-bold text-lg">
         {" "}
         {filteredTransactions.length} Transactions
-      </div>
+      </div> */}
 
       {/* Transactions Table */}
       {filteredTransactions.length === 0 ? (
@@ -368,7 +369,7 @@ const TransactionPage = () => {
                 >
                   Transaction Date {getSortIndicator("Transaction Date")}
                 </th>
-                <th className="text-start px-4 py-2">Download</th>
+                <th className="text-start px-4 py-2"> Receipt</th>
               </tr>
             </thead>
             <tbody>
@@ -439,8 +440,9 @@ const TransactionPage = () => {
                     <td className="py-2 px-4 border-b">
                       <button
                         onClick={() => handleDownload(transaction)}
-                        className="text-blue-500 hover:underline"
+                        className="text-blue-500 hover:underline flex items-center"
                       >
+                        <FaDownload className="mr-1" />
                         Download
                       </button>
                     </td>

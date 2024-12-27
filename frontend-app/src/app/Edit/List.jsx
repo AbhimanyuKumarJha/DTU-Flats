@@ -9,6 +9,7 @@ import {
 } from "react-icons/ai";
 import UserEditDetails from "./UserEditDetails.jsx";
 import api from "../lib/services/api";
+import Loader from "../New/components/Loader.jsx";
 
 const List = () => {
   const [data, setData] = useState([]);
@@ -113,9 +114,7 @@ const List = () => {
   return (
     <div className="container mx-auto p-4">
       {loading ? (
-        <div className="text-center">
-          <p>Loading...</p>
-        </div>
+        <Loader/>
       ) : (
         <>
           {/* Filters and Stats Section */}

@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react";
 import List from "./List";
+import Loader from "../New/components/Loader";
 
 const Page = () => {
   const [error, setError] = useState(null);

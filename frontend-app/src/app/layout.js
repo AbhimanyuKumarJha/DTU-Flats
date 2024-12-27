@@ -3,6 +3,7 @@ import "./globals.css";
 import Providers from "./providers";
 import Navbar from "./Navbar";
 
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",

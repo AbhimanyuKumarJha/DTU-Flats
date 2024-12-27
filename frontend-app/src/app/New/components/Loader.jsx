@@ -3,7 +3,7 @@ import { FaUniversity, FaCircleNotch } from 'react-icons/fa';
 
 const Loader = () => {
     return (
-        <div className="h-screen w-screen z-10 flex flex-col items-center justify-center bg-white bg-opacity-35 ">
+        <div className="h-screen w-full z-10 flex flex-col items-center justify-center  bg-opacity-20 ">
           {/* Logo and Institution Container */}
           <div className="mb-8 text-center">
             <div className="flex items-center justify-center mb-4">
@@ -31,7 +31,7 @@ const Loader = () => {
     
           {/* Loading Status */}
           <div className="mt-6 text-center">
-            <p className="text-gray-700 font-medium">Loading System Data</p>
+            <p className="text-black text-lg  font-bold">Loading System Data</p>
             <div className="flex justify-center mt-2 space-x-1">
               <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
               <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>

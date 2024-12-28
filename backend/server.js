@@ -22,13 +22,7 @@ connectDB();
 
 // Add CORS middleware
 const cors = require("cors");
-app.use(
-  cors({
-    origin: "http://localhost:3000", // Allow requests from the frontend
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
-    credentials: true, // Allow cookies and other credentials
-  })
-);
+app.use(cors());
 
 // Add basic security headers
 const helmet = require("helmet");

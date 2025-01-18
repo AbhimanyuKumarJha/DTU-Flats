@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { FaDownload, FaUser, FaPhone, FaAddressCard, FaCalendar, FaBuildingUser, FaCertificate, FaCircleCheck, FaFileDownload } from "react-icons/fa6";
 import { MdPayments } from "react-icons/md";
+import { MdOutlineEmail } from "react-icons/md";
 import { BiTime } from "react-icons/bi";
 import PopUp from "../utils/popup";
 // import { showRentCalculations } from "../lib/utils/showRentCalculations";
@@ -58,6 +59,8 @@ const UserCard = ({ user }) => {
     floorNumber,
     certificateIssued,
     isActive,
+    email,
+    alternateEmail,
   } = user;
 
   const isFloorDiscount = floorNumber.length > 3;
@@ -81,39 +84,65 @@ const UserCard = ({ user }) => {
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-lg">
-          {/* Enhanced field items with hover effects */}
+          {/* Name and Mobile in first row */}
           <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-white/50 transition-all duration-200 backdrop-blur-sm hover:shadow-md group">
-            <FaUser className="text-blue-500 group-hover:scale-110 transition-transform duration-200" />
+            <FaUser className="text-blue-500 text-xl group-hover:scale-110 transition-transform duration-200" />
             <span className="text-gray-700 font-semibold">Name:</span>
             <span className="text-black">{name}</span>
           </div>
-          <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-50 transition-colors duration-200">
-            <FaPhone className="text-blue-500" />
-            <span className="text-gray-700 font-semibold">Mobile Number:</span>
+          <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-white/50 transition-all duration-200">
+            <FaPhone className="text-blue-500 text-xl" />
+            <span className="text-gray-700 font-semibold">Mobile:</span>
             <span className="text-black">{mobileNumber}</span>
           </div>
-          <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-50 transition-colors duration-200">
-            <FaAddressCard className="text-blue-500" />
+          {/* Alternate Mobile if exists */}
+          {alternateMobileNumber && (
+            <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-white/50 transition-all duration-200">
+              <FaPhone className="text-blue-500 text-xl" />
+              <span className="text-gray-700 font-semibold">Alt Mobile:</span>
+              <span className="text-black">{alternateMobileNumber}</span>
+            </div>
+          )}
+          {/* Email takes full width */}
+          {email && (
+            <div className="md:col-span-2 flex items-center space-x-2 p-3 rounded-lg hover:bg-white/50 transition-all duration-200">
+              <MdOutlineEmail className="text-blue-500 text-xl" />
+              <span className="text-gray-700 font-semibold">Email:</span>
+              <span className="text-black truncate">{email}</span>
+            </div>
+          )}
+          {/* Alternate Email takes full width if exists */}
+          {alternateEmail && (
+            <div className="md:col-span-2 flex items-center space-x-2 p-3 rounded-lg hover:bg-white/50 transition-all duration-200">
+              <MdOutlineEmail className="text-blue-500 text-xl" />
+              <span className="text-gray-700 font-semibold">Alt Email:</span>
+              <span className="text-black truncate">{alternateEmail}</span>
+            </div>
+          )}
+          {/* Address takes full width */}
+          <div className="md:col-span-2 flex items-center space-x-2 p-3 rounded-lg hover:bg-white/50 transition-all duration-200">
+            <FaAddressCard className="text-blue-500 text-xl" />
             <span className="text-gray-700 font-semibold">Address:</span>
             <span className="text-black">{address}</span>
           </div>
-          <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-50 transition-colors duration-200">
-            <FaCalendar className="text-blue-500" />
-            <span className="text-gray-700 font-semibold">Date of Birth:</span>
+          {/* Other details in two columns */}
+          <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-white/50 transition-all duration-200">
+            <FaCalendar className="text-blue-500 text-xl" />
+            <span className="text-gray-700 font-semibold">DOB:</span>
             <span className="text-black">{formattedDOB}</span>
           </div>
-          <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-50 transition-colors duration-200">
-            <FaBuildingUser className="text-blue-500" />
-            <span className="text-gray-700 font-semibold">Floor Number:</span>
+          <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-white/50 transition-all duration-200">
+            <FaBuildingUser className="text-blue-500 text-xl" />
+            <span className="text-gray-700 font-semibold">Floor:</span>
             <span className="text-black">{floorNumber.join(", ")}</span>
           </div>
-          <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-50 transition-colors duration-200">
-            <FaCertificate className="text-blue-500" />
-            <span className="text-gray-700 font-semibold">Certificate Issued:</span>
+          <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-white/50 transition-all duration-200">
+            <FaCertificate className="text-blue-500 text-xl" />
+            <span className="text-gray-700 font-semibold">Certificate:</span>
             <span className="text-black">{certificateIssued}</span>
           </div>
-          <div className="flex items-center space-x-2 p-2 rounded-lg hover:bg-blue-50 transition-colors duration-200">
-            <FaCircleCheck className="text-blue-500" />
+          <div className="flex items-center space-x-2 p-3 rounded-lg hover:bg-white/50 transition-all duration-200">
+            <FaCircleCheck className="text-blue-500 text-xl" />
             <span className="text-gray-700 font-semibold">Status:</span>
             <span className="text-black">{isActive ? "Active" : "Inactive"}</span>
           </div>
@@ -265,20 +294,24 @@ const getMonthName = (monthNumber) => {
 // Main ViewBox Component
 const ViewBox = ({ user, transactions, onDownload }) => {
   return (
-    <div className="min-h-screen bg-blue-100  bg-opacity-65 backdrop-blur-sm py-6 -px-10">
+    <div className="min-h-screen bg-blue-100 bg-opacity-65 backdrop-blur-sm py-6 -px-10">
       <UserCard user={user} />
       <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-800 to-blue-600 text-center mb-8">
         Transaction Details
       </h1>
       <div className="grid grid-cols-1 gap-6">
-        {transactions.map((transaction) => (
-          <TransactionCard
-            key={transaction._id}
-            transaction={transaction}
-            onDownload={onDownload}
-            user={user}
-          />
-        ))}
+        {transactions.length > 0 ? (
+          transactions.map((transaction) => (
+            <TransactionCard
+              key={transaction._id}
+              transaction={transaction}
+              onDownload={onDownload}
+              user={user}
+            />
+          ))
+        ) : (
+          <p className="text-center text-2xl text-gray-700">No transactions available.</p>
+        )}
       </div>
     </div>
   );

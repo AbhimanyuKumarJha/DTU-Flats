@@ -48,24 +48,62 @@ const styles = StyleSheet.create({
     padding: 8,
     marginBottom: 10,
   },
+  signatureSection: {
+    marginTop: 40,
+    paddingTop: 20,
+    borderTop: '1 solid #e2e8f0',
+  },
+  signatureRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 30,
+  },
+  signatureColumn: {
+    width: '45%',
+    alignItems: 'center',
+  },
+  signatureLine: {
+    borderTop: '1 solid #000',
+    width: '100%',
+    marginBottom: 5,
+  },
+  signatureText: {
+    fontSize: 11,
+    textAlign: 'center',
+  },
+  stampContainer: {
+    position: 'absolute',
+    left: 50,
+    bottom: 60,
+    width: 100,
+    height: 100,
+    opacity: 0.8,
+  },
   detailsGrid: {
     display: 'flex',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
-    padding: 10,
+    gap: 8,
+    padding: 12,
     backgroundColor: '#f8f8f8',
     borderRadius: 5,
   },
   detailItem: {
-    width: '31%',
-    marginBottom: 10,
+    width: '48%',
+    marginBottom: 12,
+  },
+  emailItem: {
+    width: '100%',
+    marginBottom: 12,
   },
   label: {
     fontWeight: "bold",
+    marginBottom: 4,
+    fontSize: 11,
   },
   value: {
-    marginLeft: 10,
+    fontSize: 11,
+    wordBreak: 'break-word',
   },
   userDetailsContainer: {
     flexDirection: "row",
@@ -138,6 +176,8 @@ const styles = StyleSheet.create({
     padding: 4,
     borderRadius: 4,
     fontWeight: 'bold',
+    width: 'auto',
+    display: 'inline',
   },
   activeStatus: {
     backgroundColor: '#d3d3d3',
@@ -310,10 +350,6 @@ const TransactionDocument = ({ transaction, rentDetails, userData }) => {
               <Text style={styles.value}>{userData.mobileNumber}</Text>
             </View>
             <View style={styles.detailItem}>
-              <Text style={styles.label}>Alternate Mobile</Text>
-              <Text style={styles.value}>{userData.alternateMobileNumber || "N/A"}</Text>
-            </View>
-            <View style={styles.detailItem}>
               <Text style={styles.label}>Status</Text>
               <Text style={[
                 styles.statusTag,
@@ -322,6 +358,24 @@ const TransactionDocument = ({ transaction, rentDetails, userData }) => {
                 {userData.isActive ? "Active" : "Inactive"}
               </Text>
             </View>
+            {userData.alternateMobileNumber && (
+              <View style={styles.detailItem}>
+                <Text style={styles.label}>Alt. Mobile Number</Text>
+                <Text style={styles.value}>{userData.alternateMobileNumber}</Text>
+              </View>
+            )}
+            {userData.email && (
+              <View style={styles.emailItem}>
+                <Text style={styles.label}>Email</Text>
+                <Text style={styles.value}>{userData.email}</Text>
+              </View>
+            )}
+            {userData.alternateEmail && (
+              <View style={styles.emailItem}>
+                <Text style={styles.label}>Alt. Email</Text>
+                <Text style={styles.value}>{userData.alternateEmail}</Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -421,6 +475,30 @@ const TransactionDocument = ({ transaction, rentDetails, userData }) => {
             </View>
           </View>
         )}
+        <View style={styles.signatureSection}>
+          <View style={[styles.signatureRow, { justifyContent: 'flex-end' }]}>
+            <View style={styles.signatureColumn}>
+              <View style={styles.signatureLine} />
+              <Text style={styles.signatureText}>Authorized Signatory</Text>
+            </View>
+            {/* <View style={styles.signatureColumn}>
+              <View style={styles.signatureLine} />
+              <Text style={styles.signatureText}>Society Stamp</Text>
+            </View> */}
+          </View>
+          
+          {/* Stamp/Seal Placeholder */}
+          <View style={styles.stampContainer}>
+            <Image
+              src="/society_stamp.png"
+              style={{
+                width: '100%',
+                height: '100%',
+                opacity: 0.7,
+              }}
+            />
+          </View>
+        </View>
       </Page>
     </Document>
   );

@@ -313,7 +313,7 @@ const PaymentCard = ({
                     },
                   })
                 }
-                className="p-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:bg-blue-50"
+                className="p-4 text-black border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:bg-blue-50"
                 placeholder="Enter UPI Transaction ID"
               />
             </div>
@@ -337,7 +337,7 @@ const PaymentCard = ({
                     },
                   })
                 }
-                className="p-4 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:bg-blue-50"
+                className="p-4 text-black border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white hover:bg-blue-50"
                 placeholder={`Enter ${transaction.paymentMode} Number`}
               />
             </div>

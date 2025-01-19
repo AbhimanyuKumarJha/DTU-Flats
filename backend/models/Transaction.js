@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { sendTransactionEmail } = require('../utils/emailService'); // Import the email service
 
 const TransactionSchema = new mongoose.Schema(
   {
@@ -74,6 +75,19 @@ TransactionSchema.index({
 TransactionSchema.path("transactionDate").validate(function (value) {
   return value <= new Date();
 }, "Transaction date cannot be in the future");
+
+// Add post-save middleware for email notifications
+TransactionSchema.post('save', async function(doc) {
+  const isUpdate = this.isModified(); // Check if this is an update operation
+  await sendTransactionEmail(doc, isUpdate);
+});
+
+// You might also want to handle updates specifically
+TransactionSchema.post('findOneAndUpdate', async function(doc) {
+  if (doc) {
+    await sendTransactionEmail(doc, true);
+  }
+});
 
 const Transaction = mongoose.model("Transaction", TransactionSchema);
 

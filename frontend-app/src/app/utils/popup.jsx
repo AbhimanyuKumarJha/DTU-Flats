@@ -6,7 +6,7 @@ const PopUp = ({ type = "success", message }) => {
   const handleClose = () => {
     setTimeout(() => {
         setIsVisible(false);
-    }, 3000); // Delay of 3000 milliseconds (3 seconds)
+    }, 5000); // Delay of 15000 milliseconds (15 seconds)
   };
 
   if (!isVisible) return null;

@@ -42,6 +42,12 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/admins", adminRoutes);
 app.use("/api/rent-rates", rentRateRoutes);
 app.use("/api/discounts", discountRoutes);
+
+// Add a route to display "Hello Backend"
+app.get("/", (req, res) => {
+  res.send("Hello Backend");
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

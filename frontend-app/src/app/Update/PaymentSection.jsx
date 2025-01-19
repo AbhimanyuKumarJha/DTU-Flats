@@ -3,16 +3,13 @@ import { FaUser, FaPhone, FaBuilding, FaPlus } from 'react-icons/fa';
 import PaymentCard from './paymentCard';
 
 const PaymentSection = ({ selectedUser, transactions, handleTransactionUpdate, setTransactions, handleTransactionSubmit, setShowPaymentModal }) => {
-  // const [popupMessage, setPopupMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = () => {
-    handleTransactionSubmit();
-    // setPopupMessage('Transactions submitted successfully!');
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    await handleTransactionSubmit();
+    setIsLoading(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // setTimeout(() => {
-    //     setPopupMessage('');
-    // }, 5000);
   };
 
   return (
@@ -95,9 +92,16 @@ const PaymentSection = ({ selectedUser, transactions, handleTransactionUpdate, s
         <button
           onClick={handleSubmit}
           className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
+          disabled={isLoading}
         >
-          <FaPlus className="w-5 h-5 mr-2" />
-          Submit Transaction
+          {isLoading ? (
+            <span>Loading...</span>
+          ) : (
+            <>
+              <FaPlus className="w-5 h-5 mr-2" />
+              Submit Transaction
+            </>
+          )}
         </button>
       </div>
 

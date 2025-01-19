@@ -91,7 +91,7 @@ const UserDetailPage = () => {
     try {
       // Fetch user data using the userId from the transaction
       const userData = await api.getUserById(transaction.userId._id);
-      console.log("handledownload userdata",userData);
+      // console.log("handledownload userdata",userData);
       const rentDetails = calculateRentDetails(transaction);
       const transactionWithRentDetails = { ...transaction, rentDetails, userData }; // Include user data
       await generateAndDownloadPDF(transactionWithRentDetails);

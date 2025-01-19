@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer'); // Import Nodemailer
 const { getUserById } = require('./userService'); // Import your user service
+// import { generateAndDownloadPDF } from "../../frontend-app/src/app/lib/utils/pdfGenerator";
 
 // Create a transporter instance
 const transporter = nodemailer.createTransport({
@@ -72,6 +73,8 @@ const sendTransactionEmail = async (transaction, isUpdate = false) => {
                         </td>
                         <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">
                           ${transaction.paymentMode}
+                          ${transaction.paymentMode === 'UPI' ? `<br><strong>UPI ID:</strong> ${transaction.paymentDetails.upiTransactionId}` : ''}
+                          ${['Cheque', 'DD'].includes(transaction.paymentMode) ? `<br><strong>${transaction.paymentMode} Number:</strong> ${transaction.paymentDetails.chequeOrDDNumber}` : ''}
                         </td>
                       </tr>
                       <tr>
@@ -100,7 +103,15 @@ const sendTransactionEmail = async (transaction, isUpdate = false) => {
                           ${new Date(transaction.transactionDate).toLocaleDateString()}
                         </td>
                       </tr>
-                      ${getPaymentDetailsHtml(transaction)}
+                      <tr>
+                        <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">
+                          <strong>Transaction Time:</strong>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">
+                          ${new Date(transaction.transactionDate).toLocaleTimeString()}
+                        </td>
+                      </tr>
+                      
                     </table>
 
                     <p style="margin: 20px 0; padding: 15px; background-color: #e8f4fd; border-radius: 4px; border-left: 4px solid #003366;">
@@ -132,7 +143,7 @@ const sendTransactionEmail = async (transaction, isUpdate = false) => {
 
     await transporter.sendMail({
       from: `"DTU Accounts" <${process.env.EMAIL_USER}>`,
-      to: user.email,
+      to: `${user.email}, ${user.alternateEmail ? user.alternateEmail : ''}`.trim(),
       subject: emailSubject,
       html: emailContent
     });

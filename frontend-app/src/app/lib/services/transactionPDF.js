@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   emailItem: {
-    width: '100%',
+    
     marginBottom: 12,
   },
   label: {
@@ -291,9 +291,10 @@ const TransactionDocument = ({ transaction, rentDetails, userData }) => {
           <Text style={[styles.headerText, styles.deanTitle]}>General Admin</Text>
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' }}>
             <Text style={styles.dateText}>Dated: {getCurrentDate()}</Text>
+            {/* <Text style={styles.dateText}> {transactionDateDisplay.split(',')[1].split(' ')[1]}</Text> */}
           </View>
           <View style={styles.divider} />
-          <Text style={[styles.documentTitle, { marginTop: 4 }]}>RENT PAYMENT RECEIPT</Text>
+          <Text style={[styles.documentTitle, { marginTop: 4 }]}>PAYMENT RECEIPT</Text>
         </View>
 
         
@@ -372,7 +373,7 @@ const TransactionDocument = ({ transaction, rentDetails, userData }) => {
             )}
             {userData.alternateEmail && (
               <View style={styles.emailItem}>
-                <Text style={styles.label}>Alt. Email</Text>
+                <Text style={styles.label}>Alternate Email</Text>
                 <Text style={styles.value}>{userData.alternateEmail}</Text>
               </View>
             )}
@@ -399,7 +400,7 @@ const TransactionDocument = ({ transaction, rentDetails, userData }) => {
         </View>
 
         {/* Transaction Details */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>Transaction Details</Text>
           <View style={styles.detailsGrid}>
             <View style={styles.detailItem}>
@@ -415,10 +416,10 @@ const TransactionDocument = ({ transaction, rentDetails, userData }) => {
               <Text style={styles.value}>{userData.certificateIssued}</Text>
             </View>
           </View>
-        </View>
+        </View> */}
 
         {/* Rent Details Section */}
-        <Text style={[styles.rentHeader]}>RENT BREAKDOWN</Text>
+        <Text style={[styles.rentHeader]}>Maintenance charges</Text>
         {monthlyCalculations && (
           <View>
             {monthlyCalculations.map(({ month, year, amount }, index) => (
